@@ -1,26 +1,32 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import LoginScreen from "./login/LoginScreen";
+import UserApp from "./UserApp";
 
-function App() {
+import * as dsnpLink from "./dsnpLink";
+import { UserAccount } from "./types";
+
+const App = (): JSX.Element => {
+  const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
+
+  const handleLogin = (account: UserAccount) => {
+    setUserAccount(account);
+  };
+
+  const handleLogout = () => {
+    setUserAccount(null);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {!userAccount ? (
+        <LoginScreen onLogin={handleLogin} />
+      ) : (
+        <UserApp account={userAccount} onLogout={handleLogout} />
+      )}
     </div>
   );
-}
+};
 
 export default App;

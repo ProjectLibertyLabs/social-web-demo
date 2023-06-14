@@ -1,0 +1,93 @@
+import React, { useState } from "react";
+import { Card, Spin } from "antd";
+import { HexString, User } from "../types";
+import UserAvatar from "../chrome/UserAvatar";
+import PostMedia from "./PostMedia";
+import RelativeTime from "../helpers/RelativeTime";
+import ReplyBlock from "./ReplyBlock";
+import PostHashDropdown from "./PostHashDropdown";
+import { FromTitle } from "./FromTitle";
+import {
+  ActivityContentNote,
+  ActivityContentAttachment,
+} from "@dsnp/activity-content/types";
+// import { buildDSNPAnnouncementURI } from "@dsnp/sdk/core/identifiers";
+import { Anchorme } from "react-anchorme";
+import * as dsnpLink from "../dsnpLink";
+import { useGetUser } from "../service/UserProfileService";
+import { buildDSNPContentURI } from "../helpers/dsnp";
+
+type FeedItem = dsnpLink.BroadcastExtended;
+
+type PostProps = {
+  feedItem: FeedItem;
+  goToProfile: (dsnpId: number) => void;
+  showReplyInput: boolean;
+};
+
+const Post = ({
+  feedItem,
+  goToProfile,
+  showReplyInput,
+}: PostProps): JSX.Element => {
+  const [isHoveringProfile, setIsHoveringProfile] = useState(false);
+
+  const { user, isLoading } = useGetUser(feedItem.fromId);
+
+  const content = JSON.parse(feedItem?.content) as ActivityContentNote;
+
+  // TODO: validate content as ActivityContentNote or have DSNP Link do it
+
+  const attachments: ActivityContentAttachment[] = content.attachment || [];
+
+  return (
+    <Card key={feedItem.contentHash} className="Post__block" bordered={false}>
+      <Spin tip="Loading" size="large" spinning={isLoading}>
+        <div
+          onClick={() => goToProfile(feedItem.fromId)}
+          onMouseEnter={() => setIsHoveringProfile(true)}
+          onMouseLeave={() => setIsHoveringProfile(false)}
+          className="Post__metaBlock"
+        >
+          <Card.Meta
+            className="Post__metaInnerBlock"
+            avatar={<UserAvatar user={user} avatarSize={"medium"} />}
+            title={
+              <FromTitle user={user} isHoveringProfile={isHoveringProfile} />
+            }
+          />
+        </div>
+        <div className="Post__rightCorner">
+          {content?.published && (
+            <RelativeTime published={content?.published} postStyle={true} />
+          )}
+          <PostHashDropdown
+            hash={feedItem.contentHash}
+            fromId={feedItem.fromId}
+          />
+        </div>
+        <>
+          {content && (
+            <div className="Post__caption">
+              <Anchorme target="_blank" rel="noreferrer noopener">
+                {content?.content}
+              </Anchorme>
+            </div>
+          )}
+          {content?.attachment && <PostMedia attachments={attachments} />}
+        </>
+        <ReplyBlock
+          parentURI={buildDSNPContentURI(
+            BigInt(feedItem.fromId),
+            feedItem.contentHash
+          )}
+          showReplyInput={showReplyInput}
+          goToProfile={goToProfile}
+          replies={feedItem.replies || []}
+        />
+      </Spin>
+    </Card>
+  );
+};
+
+export default Post;

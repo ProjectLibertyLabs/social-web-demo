@@ -1,0 +1,21 @@
+{
+  "plugins": [],
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "declaration-empty-line-before": null,
+    "declaration-colon-newline-after": null,
+    "declaration-no-important": true,
+    "max-nesting-depth": 1,
+    "selector-class-pattern": [
+      "^([A-Z][a-zA-Z0-9-]+(__[a-z][a-zA-Z0-9]+)?(--[a-z][a-zA-Z0-9]+)*|u-[a-z][a-zA-Z0-9]+)$",
+      {
+        "resolveNestedSelectors": true
+      }
+    ],
+    "selector-max-compound-selectors": 1,
+    "selector-max-id": 0,
+    "selector-no-qualifying-type": true,
+    "value-list-comma-newline-after": null,
+    "keyframes-name-pattern": null
+  }
+}

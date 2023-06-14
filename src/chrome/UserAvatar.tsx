@@ -1,0 +1,39 @@
+import React from "react";
+import { Avatar } from "antd";
+import * as blockies from "blockies-ts";
+import * as dsnpLink from "../dsnpLink";
+import { UserOutlined } from "@ant-design/icons";
+import type { User } from "../types";
+
+const dsnpLinkCtx = dsnpLink.createContext();
+
+const avatarSizeOptions = new Map([
+  ["small", 28],
+  ["medium", 50],
+  ["large", 100],
+  ["xl", 150],
+]);
+
+interface UserAvatarProps {
+  user: User | undefined;
+  avatarSize: "small" | "medium" | "large" | "xl";
+}
+
+const UserAvatar = ({ user, avatarSize }: UserAvatarProps): JSX.Element => {
+  const iconURL = user
+    ? user.profile?.icon ||
+      blockies.create({ seed: user.dsnpId.toString() }).toDataURL()
+    : "";
+
+  return (
+    <Avatar
+      className="UserAvatar"
+      icon={<UserOutlined />}
+      src={iconURL}
+      size={avatarSizeOptions.get(avatarSize)}
+      style={{ minWidth: avatarSizeOptions.get(avatarSize) }}
+    />
+  );
+};
+
+export default UserAvatar;
