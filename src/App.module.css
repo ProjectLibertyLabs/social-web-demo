@@ -1,0 +1,10 @@
+.root {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.content {
+  padding: 10px;
+  justify-content: center;
+}

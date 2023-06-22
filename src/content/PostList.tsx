@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import Title from "antd/es/typography/Title";
 import BlankPost from "./BlankPost";
 import Post from "./Post";
 import * as dsnpLink from "../dsnpLink";
@@ -77,8 +78,8 @@ const PostList = ({ feedType, user }: PostListProps): JSX.Element => {
           dataLength={currentFeed.length + (hasMore ? 1 : 0)}
           next={fetchData}
           hasMore={hasMore}
-          loader={<h4>Loading...</h4>}
-          endMessage={<h4>That's all there is!</h4>}
+          loader={<Title level={4}>Loading...</Title>}
+          endMessage={<Title level={4}>That's all there is!</Title>}
         >
           {currentFeed.map((feedItem, index) => (
             <Post

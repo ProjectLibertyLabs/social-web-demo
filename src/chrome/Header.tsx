@@ -3,24 +3,26 @@ import UserAvatar from "./UserAvatar";
 import { Popover } from "antd";
 import UserMenu from "./UserMenu";
 import type { UserAccount } from "../types";
+import styles from "./Header.module.css";
+import Title from "antd/es/typography/Title";
 
 type HeaderProps = {
-  account: UserAccount;
-  logout: () => void;
+  account?: UserAccount;
+  logout?: () => void;
 };
 
 const Header = ({ account, logout }: HeaderProps): JSX.Element => {
   return (
-    <div className="Header__block">
-      <h1 className="Header__title">Social Web</h1>
-      <Popover
+    <div className={styles.root}>
+      <Title level={1} className={styles.title}>Social Web Demo</Title>
+      {account && logout && <Popover
         placement="bottomRight"
         trigger="click"
         content={<UserMenu logout={logout} />}
       >
         <UserAvatar user={account} avatarSize="small" />
         <div>{account.handle}</div>
-      </Popover>
+      </Popover>}
     </div>
   );
 };

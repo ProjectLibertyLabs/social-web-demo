@@ -1,14 +1,16 @@
 import React from "react";
+import Title from "antd/es/typography/Title";
+import Paragraph from "antd/es/typography/Paragraph";
 
 const MissingWallet = (): JSX.Element => {
   return (
     <div>
-      <h2>Polkadot.js Extension Not Detected</h2>
-      <p>
+      <Title level={2}>Polkadot.js Extension Not Detected</Title>
+      <Paragraph>
         To use this application, you need to install the Polkadot.js browser
         extension.
-      </p>
-      <p>Please follow the steps below to install the extension:</p>
+      </Paragraph>
+      <Paragraph>Please follow the steps below to install the extension:</Paragraph>
       <ol>
         <li>Open the Chrome or Firefox web browser.</li>
         <li>Go to the Polkadot.js Extension page:</li>

@@ -1,9 +1,13 @@
 import React from "react";
-import { Button, Space, Spin, Modal, Input } from "antd";
+import { Button, Modal, Input, Form } from "antd";
 import UserAvatar from "../chrome/UserAvatar";
 import NewPostImageUpload from "./NewPostImageUpload";
 import type { User } from "../types";
 import { createNote } from "@dsnp/activity-content/factories";
+import { InternalUploadFile } from "antd/es/upload/interface";
+import * as dsnpLink from "../dsnpLink";
+
+const dsnpLinkCtx = dsnpLink.createContext();
 
 interface NewPostProps {
   onSuccess: () => void;
@@ -11,72 +15,62 @@ interface NewPostProps {
   account: User;
 }
 
+type NewPostValues = {
+  message: string;
+  test: string;
+  images: Array<{ upload: { file: InternalUploadFile } }>
+};
+
 const NewPost = ({
   onSuccess,
   onCancel,
   account,
 }: NewPostProps): JSX.Element => {
+  const [form] = Form.useForm();
   const [saving, setSaving] = React.useState<boolean>(false);
-  const [uriList, setUriList] = React.useState<string[]>([]);
-  const [postMessage, setPostMessage] = React.useState<string>("");
-  const [isValidPost, setIsValidPost] = React.useState<boolean>(false);
+
 
   const success = () => {
     setSaving(false);
     onSuccess();
   };
 
-  const createPost = async () => {
-    const note = createNote(postMessage, new Date());
+  const createPost = async (formValues: NewPostValues) => {
+    console.log(formValues);
+    const note = createNote(formValues.message, new Date());
+    await dsnpLink.createBroadcast(dsnpLinkCtx, {}, note);
     console.log("postActivityContentCreated", { note: note });
     // await sendPost(userId, note);
     // dispatch(postLoading({ loading: true, currentUserId: userId }));
     success();
   };
 
-  const handleMessageInputChange = (
-    e: React.ChangeEvent<HTMLTextAreaElement>
-  ) => {
-    if (saving) return;
-    e.target.value !== "" ? setIsValidPost(true) : setIsValidPost(false);
-    setPostMessage(e.target.value);
-  };
-
   return (
     <Modal
-      className="NewPost"
+      title="New Post"
       open={true}
       onCancel={onCancel}
-      width="535px"
+      footer={null}
       centered={true}
-      footer={[
-        <Spin spinning={saving} key={1}>
-          <Space>
-            <Button
-              className="NewPost__footerBtn"
-              key="post"
-              type="primary"
-              disabled={!isValidPost || saving}
-              onClick={createPost}
-            >
-              Post
-            </Button>
-          </Space>
-        </Spin>,
-      ]}
     >
-      <div className="NewPost__textAreaRow">
-        <UserAvatar user={account} avatarSize={"medium"} />
-        <Input.TextArea
-          autoFocus={true}
-          className="NewPost__textArea"
-          placeholder="Message"
-          value={postMessage || ""}
-          onChange={(e) => handleMessageInputChange(e)}
-          autoSize={{ minRows: 2, maxRows: 5 }}
-        />
-      </div>
-      <NewPostImageUpload onNewPostImageUpload={setUriList} />
+      <Form form={form} onFinish={createPost}>
+        <Form.Item>
+          <UserAvatar user={account} avatarSize={"medium"} />
+          Posting as @{account.handle}
+        </Form.Item>
+        <Form.Item name="message" required={true}>
+          <Input.TextArea rows={4} placeholder="Enter your message" />
+        </Form.Item>
+        <NewPostImageUpload onChange={(fileList) => {
+          form.setFieldsValue({ images: fileList });
+          form.validateFields(['images']);
+        }} />
+        <Form.Item>
+          <Button type="primary" htmlType="submit" loading={saving}>
+            Post
+          </Button>
+        </Form.Item>
+      </Form>
     </Modal>
   );
 };

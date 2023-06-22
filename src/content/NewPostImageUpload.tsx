@@ -1,82 +1,93 @@
-import { Alert, Input } from "antd";
-import { CameraOutlined } from "@ant-design/icons";
+import { Alert, Form, Modal, Upload } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import type { RcFile, UploadProps } from 'antd/es/upload';
+import type { UploadFile } from 'antd/es/upload/interface';
 import React from "react";
-import { HexString } from "../types";
-import { Button } from "antd";
-import NewPostThumbnails from "./NewPostThumbnails";
+
+const getBase64 = (file: RcFile): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
 
 interface NewPostImageUploadProps {
-  onNewPostImageUpload: (uris: string[]) => void;
+  onChange: (fileList: UploadFile[]) => void;
 }
 
 const NewPostImageUpload = ({
-  onNewPostImageUpload,
+  onChange,
 }: NewPostImageUploadProps): JSX.Element => {
-  const [urlErrorMsg, setUrlErrorMsg] = React.useState<string | null>(null);
-  const [newUri, setNewUri] = React.useState<string>("");
-  const [uriList, setUriList] = React.useState<string[]>([]);
-  const hasValidPostURI = newUri && newUri.match(/.+\..+\//);
+  const [fileList, setFileList] = React.useState<UploadFile[]>([]);
+  const [previewOpen, setPreviewOpen] = React.useState(false);
+  const [previewImage, setPreviewImage] = React.useState('');
+  const [previewTitle, setPreviewTitle] = React.useState('');
+  const [errorMsg, setErrorMsg] = React.useState<string | null>(null);
 
-  const newContentItem = (value: HexString) => {
-    setNewUri(value);
-    setUrlErrorMsg(null);
-  };
+  const handleCancel = () => setPreviewOpen(false);
 
-  const addContentToList = () => {
-    if (hasValidPostURI) {
-      const newUriList = [...uriList, newUri];
-      setUriList(newUriList);
-      onNewPostImageUpload(newUriList);
-      setNewUri("");
-    } else {
-      setUrlErrorMsg("Invalid URL.");
+  const handlePreview = async (file: UploadFile) => {
+    if (!file.url && !file.preview) {
+      file.preview = await getBase64(file.originFileObj as RcFile);
     }
+
+    setPreviewImage(file.url || (file.preview as string));
+    setPreviewOpen(true);
+    setPreviewTitle(file.name || file.url!.substring(file.url!.lastIndexOf('/') + 1));
   };
 
-  const deleteImage = (toBeDeletedIndex: number) => {
-    const deletedImageArray = [...uriList];
-    deletedImageArray.splice(toBeDeletedIndex, 1);
-    setUriList(deletedImageArray);
-    onNewPostImageUpload(deletedImageArray);
+  const handleChange: UploadProps['onChange'] = ({ fileList: newFileList }) => {
+    setFileList(newFileList)
+    onChange(newFileList);
+  }
+
+  const handleUpload: UploadProps['customRequest'] = (options) => {
+    const { file, onSuccess, onError } = options;
+    const reader = new FileReader();
+    reader.onload = () => {
+      // Perform any image validation here if needed
+      // ...
+
+      // Simulate upload success (you can replace this with actual upload logic)
+      // setTimeout(() => {
+      //   onSuccess?.('ok');
+      // }, 1000);
+    };
+    reader.onerror = () => {
+      // Handle file read error
+      onError?.(new Error('Failed to read file'));
+    };
+    reader.readAsDataURL(file as any);
   };
+
 
   return (
     <>
-      <div className="NewPostThumbnails__cover">
-        {uriList &&
-          uriList.map((uri, index) => (
-            <div key={index}>
-              <NewPostThumbnails
-                uri={uri}
-                index={index}
-                deleteImage={deleteImage}
-              />
-            </div>
-          ))}
-      </div>
-      <div className="NewPostImageUpload__urlInputBlock">
-        <CameraOutlined style={{ fontSize: "28px" }} />
-        <Input
-          className="NewPostImageUpload__urlInput"
-          placeholder="Content URL"
-          value={newUri || ""}
-          onChange={(e) => newContentItem(e.target.value)}
-          onPressEnter={addContentToList}
-        />
-        <Button
-          className="NewPostImageUpload__urlInputBtn"
-          onClick={addContentToList}
-        >
-          Add
-        </Button>
-      </div>
-      {urlErrorMsg && (
-        <Alert
-          className="NewPostImageUpload__alert"
-          type="error"
-          message={urlErrorMsg}
-        />
-      )}
+      <Form.Item
+        validateStatus={errorMsg ? "error" : ""}
+        name="images"
+        valuePropName="fileList"
+        help={errorMsg}
+        noStyle
+      >
+        <Upload name="media-upload"
+          multiple
+          beforeUpload={() => false}
+          listType="picture-card"
+          fileList={fileList}
+          onPreview={handlePreview}
+          customRequest={handleUpload}
+          onChange={handleChange}>
+          <div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>Upload</div>
+          </div>
+        </Upload>
+      </Form.Item>
+      <Modal open={previewOpen} title={previewTitle} footer={null} onCancel={handleCancel}>
+        <img alt="Preview" style={{ width: '100%' }} src={previewImage} />
+      </Modal>
     </>
   );
 };

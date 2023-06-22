@@ -1,31 +1,64 @@
-import React, { useState } from "react";
-import logo from "./logo.svg";
-import "./App.css";
+import React from "react";
+import styles from "./App.module.css";
 import LoginScreen from "./login/LoginScreen";
-import UserApp from "./UserApp";
+
+import useStickyState from "./helpers/StickyState";
 
 import * as dsnpLink from "./dsnpLink";
 import { UserAccount } from "./types";
+import Header from "./chrome/Header";
+import Feed from "./Feed";
+import { Col, ConfigProvider, Row } from "antd";
 
 const App = (): JSX.Element => {
-  const [userAccount, setUserAccount] = useState<UserAccount | null>(null);
+  const _fakeUser = {
+    address: "0x",
+    expiresIn: 100,
+    accessToken: "23",
+  handle: "handle-test",
+  dsnpId: 1
+  };
+  const [userAccount, setUserAccount] = useStickyState<UserAccount | undefined>(undefined, "user-account");
+  const [selectedNetwork, setSelectedNetwork] = useStickyState<string | undefined>(undefined, "selected-network");
 
-  const handleLogin = (account: UserAccount) => {
+  const handleLogin = (account: UserAccount, network: string) => {
     setUserAccount(account);
+    setSelectedNetwork(network);
   };
 
   const handleLogout = () => {
-    setUserAccount(null);
+    setUserAccount(undefined);
+    setSelectedNetwork(undefined);
   };
 
   return (
-    <div>
-      {!userAccount ? (
-        <LoginScreen onLogin={handleLogin} />
-      ) : (
-        <UserApp account={userAccount} onLogout={handleLogout} />
-      )}
+    <ConfigProvider
+    theme={{
+      token: {
+        colorPrimary: "#4473ec",
+        colorSuccess: "#29fd47",
+        colorWarning: "#ff7f0e",
+        colorInfo: "#4473ec",
+      }
+    }}
+    >
+    <div className={styles.root}>
+      <Row>
+        <Col span={24}>
+          <Header account={userAccount} logout={handleLogout} />
+        </Col>
+      </Row>
+      <Row className={styles.content}>
+        <Col span={24}>
+          {!userAccount ? (
+            <LoginScreen onLogin={handleLogin} />
+          ) : (
+            <Feed account={userAccount} />
+          )}
+        </Col>
+      </Row>
     </div>
+    </ConfigProvider>
   );
 };
 

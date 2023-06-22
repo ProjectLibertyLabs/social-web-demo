@@ -5,12 +5,14 @@ import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import MissingWallet from "./MissingWallet";
 import * as dsnpLink from "../dsnpLink";
 import CreateIdentity from "./CreateIdentity";
+import Login from "./Login";
 import { HandlesMap, UserAccount } from "../types";
+import styles from "./LoginScreen.module.css";
 
 const dsnpLinkCtx = dsnpLink.createContext();
 
 interface LoginScreenProps {
-  onLogin: (account: UserAccount) => void;
+  onLogin: (account: UserAccount, network: string) => void;
 }
 
 const toHandlesMap = (
@@ -36,8 +38,7 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
   const [hasWalletExtension, setHasWalletExtension] = useState(true);
   const [extensionConnected, setExtensionConnected] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedNetwork, setSelectedNetwork] = useState<string>("");
-  const [selectedAccount, setSelectedAccount] = useState<string>("");
+  const [selectedNetwork, setSelectedNetwork] = useState<string>("https://rpc.rococo.frequency.xyz");
   const [handlesMap, setHandlesMap] = useState<HandlesMap>(new Map());
 
   const connectExtension = async () => {
@@ -73,92 +74,43 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
     // filter account list?
   };
 
-  const handleLogin = async () => {
-    if (!selectedAccount) return;
-    const handle = handlesMap.get(selectedAccount)?.handle;
-    if (!handle) return;
-    setIsLoading(true);
-
-    const { challenge } = await dsnpLink.authChallenge(dsnpLinkCtx, {});
-
-    const { accessToken, expiresIn, dsnpId } = await dsnpLink.authLogin(
-      dsnpLinkCtx,
-      {},
-      {
-        algo: "SR25519",
-        encoding: "base16",
-        encodedValue: "0x",
-        publicKey: "0x",
-      }
-    );
-    onLogin({
-      address: selectedAccount,
-      handle,
-      accessToken,
-      expiresIn,
-      dsnpId,
-    });
-  };
-
-  const handlesValues = [...handlesMap.values()].filter(
-    ({ handle }) => !!handle
-  );
-
   return (
-    <div>
+    <div className={styles.root}>
       <Spin tip="Loading" size="large" spinning={isLoading}>
-        {!hasWalletExtension && !isLoading && <MissingWallet />}
-        {hasWalletExtension && !extensionConnected && (
-          <Form wrapperCol={{ span: 12 }} layout="vertical" size="large">
-            <Form.Item label="Select Network">
-              <Select<string>
-                onChange={handleNetworkChange}
-                placeholder="Select Network"
-                defaultValue="local"
-                options={[
-                  { value: "mainnet", label: "Frequency Mainnet" },
-                  { value: "testnet", label: "Frequency Testnet" },
-                  { value: "local", label: "Local Frequency" },
-                ]}
-              />
-            </Form.Item>
-            <Form.Item label="">
-              <Button type="primary" onClick={connectExtension}>
-                Connect to Polkadot.js Extension
-              </Button>
-            </Form.Item>
-          </Form>
-        )}
-        {extensionConnected && (
-          <>
-            <Row>
+        <Row className={styles.content}>
+          {!hasWalletExtension && !isLoading && <MissingWallet />}
+          {hasWalletExtension && !extensionConnected && (
+            <Form wrapperCol={{ span: 24 }} layout="vertical" size="large">
+              <Form.Item label="Select Network">
+                <Select<string>
+                  onChange={handleNetworkChange}
+                  placeholder="Select Network"
+                  defaultValue={selectedNetwork}
+                  options={[
+                    { value: "https://1.rpc.frequency.xyz", label: "Frequency Mainnet" },
+                    { value: "https://rpc.rococo.frequency.xyz", label: "Frequency Testnet" },
+                    { value: "http://localhost:9944", label: "Local Frequency" },
+                  ]}
+                />
+              </Form.Item>
+              <Form.Item label="">
+                <Button type="primary" onClick={connectExtension}>
+                  Connect to Polkadot.js Extension
+                </Button>
+              </Form.Item>
+            </Form>
+          )}
+          {extensionConnected && (
+            <>
               <Col span={12}>
-                <Form layout="vertical" size="large">
-                  <Form.Item label="">
-                    <Select<string>
-                      disabled={handlesValues.length === 0}
-                      onChange={setSelectedAccount}
-                      placeholder="Select Account"
-                      options={handlesValues.map(({ account, handle }) => ({
-                        value: account.address,
-                        label: handle,
-                      }))}
-                    />
-                  </Form.Item>
-
-                  <Form.Item label="">
-                    <Button type="primary" onClick={handleLogin}>
-                      Login
-                    </Button>
-                  </Form.Item>
-                </Form>
+                <Login onLogin={onLogin} selectedNetwork={selectedNetwork} handlesMap={handlesMap} />
               </Col>
               <Col span={12}>
-                <CreateIdentity onLogin={onLogin} handlesMap={handlesMap} />
+                <CreateIdentity onLogin={onLogin} selectedNetwork={selectedNetwork} handlesMap={handlesMap} />
               </Col>
-            </Row>
-          </>
-        )}
+            </>
+          )}
+        </Row>
       </Spin>
     </div>
   );

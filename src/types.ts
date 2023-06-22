@@ -21,8 +21,6 @@ export type HandlesMap = Map<
   { handle: string | null; account: InjectedAccountWithMeta }
 >;
 
-export type RawSigningPayload = { toU8a: () => U8aLike };
-
 export enum FeedTypes {
   MY_FEED,
   DISCOVER,

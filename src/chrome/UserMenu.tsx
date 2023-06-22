@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "antd";
+import styles from "./UserMenu.module.css";
 
 interface UserMenuProps {
   logout: () => void;
@@ -7,7 +8,7 @@ interface UserMenuProps {
 
 const UserMenu = ({ logout }: UserMenuProps): JSX.Element => {
   return (
-    <Button aria-label="Logout" onClick={logout}>
+    <Button className={styles.Signout} aria-label="Logout" onClick={logout}>
       Sign Out
     </Button>
   );

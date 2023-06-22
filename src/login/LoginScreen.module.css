@@ -1,0 +1,24 @@
+:root {
+    --login-bg: white;
+}
+
+.root {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    background-color: var(--login-bg);
+    border-radius: 10px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    height: -moz-fit-content;
+    margin-right: 15px;
+}
+
+.content {
+    display: flex;
+    max-width: 1200px;
+    padding: 0 10px;
+    margin: 0 auto;
+}

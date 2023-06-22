@@ -1,11 +1,9 @@
 import React from "react";
 import { Avatar } from "antd";
 import * as blockies from "blockies-ts";
-import * as dsnpLink from "../dsnpLink";
 import { UserOutlined } from "@ant-design/icons";
 import type { User } from "../types";
-
-const dsnpLinkCtx = dsnpLink.createContext();
+import styles from "./UserAvatar.module.css";
 
 const avatarSizeOptions = new Map([
   ["small", 28],
@@ -27,7 +25,7 @@ const UserAvatar = ({ user, avatarSize }: UserAvatarProps): JSX.Element => {
 
   return (
     <Avatar
-      className="UserAvatar"
+      className={styles.root}
       icon={<UserOutlined />}
       src={iconURL}
       size={avatarSizeOptions.get(avatarSize)}

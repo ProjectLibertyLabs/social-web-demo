@@ -4,6 +4,7 @@ import PostList from "./content/PostList";
 import { Button } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { UserAccount, FeedTypes, User } from "./types";
+import styles from "./Feed.module.css";
 
 type FeedProps = {
   account: UserAccount;
@@ -21,8 +22,8 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
 
   const feedNavClassName = (navItemType: FeedTypes) =>
     feedType === navItemType
-      ? "Feed__navigationItem Feed__navigationItem--active"
-      : "Feed__navigationItem";
+      ? [styles.navigationItem, styles['navigationItem--active']].join(" ")
+      : styles.navigationItem;
 
   const resetFeed = () => {
     setShowDisplayIdNav(false);
@@ -34,12 +35,15 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
   // }, [showDisplayIdNav, displayId]);
 
   return (
-    <div className="Feed__block">
-      <div className="Feed__header">
-        <nav className="Feed__navigation">
+    <div className={styles.root}>
+      <div className={styles.header}>
+        <nav className={styles.navigation}>
           {showDisplayIdNav && (
             <>
-              <div className="Feed__backArrow" onClick={() => resetFeed()}>
+              <div
+                className={styles.backArrow}
+                onClick={() => resetFeed()}
+              >
                 <ArrowLeftOutlined />
               </div>
               <div
@@ -49,7 +53,7 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
                 {/* <UserName user={user} /> */}
                 TODO: Single User's Posts
               </div>
-              <div className="Feed__navigationSpacer"></div>
+              <div className={styles.navigationSpacer}></div>
             </>
           )}
           <div
@@ -58,14 +62,14 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
           >
             Discover
           </div>
-          <div className="Feed__navigationSpacer"></div>
+          <div className={styles.navigationSpacer}></div>
           <div
             className={feedNavClassName(FeedTypes.MY_FEED)}
             onClick={() => setFeedType(FeedTypes.MY_FEED)}
           >
             My Feed
           </div>
-          <div className="Feed__navigationSpacer"></div>
+          <div className={styles.navigationSpacer}></div>
           <div
             className={feedNavClassName(FeedTypes.DISPLAY_ID_POSTS)}
             onClick={() => setFeedType(FeedTypes.DISPLAY_ID_POSTS)}
@@ -74,7 +78,7 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
           </div>
         </nav>
         <Button
-          className="Feed__newPostButton"
+          className={styles.newPostButton}
           onClick={() => setIsModalOpen(true)}
         >
           New Post

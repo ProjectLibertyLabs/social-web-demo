@@ -1,10 +1,9 @@
 {
   "name": "social-web-example",
   "version": "0.1.0",
-  "private": true,
   "dependencies": {
     "@ant-design/icons": "^5.1.4",
-    "@dsnp/activity-content": "file:../activity-content/dist/dsnp-activity-content-1.0.1.tgz",
+    "@dsnp/activity-content": "^1.1.0",
     "@polkadot/extension-dapp": "^0.46.4",
     "@polkadot/util": "^12.2.2",
     "@testing-library/jest-dom": "^5.16.5",

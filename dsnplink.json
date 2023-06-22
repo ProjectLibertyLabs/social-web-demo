@@ -263,7 +263,7 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "$ref": "#/components/schemas/CreatePostRequest"
               }
@@ -518,7 +518,10 @@
             "type": "integer"
           },
           "schemas": {
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
           }
         },
         "required": [
@@ -589,11 +592,17 @@
       "CreateIdentityRequest": {
         "type": "object",
         "properties": {
+          "addProviderSignature": {
+            "type": "string"
+          },
           "algo": {
             "type": "string",
             "enum": [
               "SR25519"
             ]
+          },
+          "baseHandle": {
+            "type": "string"
           },
           "encoding": {
             "type": "string",
@@ -602,22 +611,24 @@
               "base58"
             ]
           },
-          "encodedValue": {
+          "expiration": {
+            "type": "number"
+          },
+          "handleSignature": {
             "type": "string"
           },
           "publicKey": {
             "type": "string"
-          },
-          "handle": {
-            "type": "string"
           }
         },
         "required": [
+          "addProviderSignature",
           "algo",
-          "encodedValue",
+          "baseHandle",
           "encoding",
-          "publicKey",
-          "handle"
+          "expiration",
+          "handleSignature",
+          "publicKey"
         ]
       },
       "CreateIdentityResponse": {
@@ -794,11 +805,16 @@
         "properties": {
           "content": {
             "type": "string"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            }
           }
         },
-        "required": [
-          "content"
-        ]
+        "required": ["content"]
       },
       "EditPostRequest": {
         "type": "object",
