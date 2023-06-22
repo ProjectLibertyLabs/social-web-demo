@@ -1,4 +1,4 @@
-import { Alert, Form, Modal, Upload } from "antd";
+import { Form, Modal, Upload } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import type { RcFile, UploadProps } from 'antd/es/upload';
 import type { UploadFile } from 'antd/es/upload/interface';
@@ -46,13 +46,7 @@ const NewPostImageUpload = ({
     const { file, onSuccess, onError } = options;
     const reader = new FileReader();
     reader.onload = () => {
-      // Perform any image validation here if needed
-      // ...
-
-      // Simulate upload success (you can replace this with actual upload logic)
-      // setTimeout(() => {
-      //   onSuccess?.('ok');
-      // }, 1000);
+      onSuccess?.('ok');
     };
     reader.onerror = () => {
       // Handle file read error

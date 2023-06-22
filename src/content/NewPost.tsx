@@ -3,6 +3,7 @@ import { Button, Modal, Input, Form } from "antd";
 import UserAvatar from "../chrome/UserAvatar";
 import NewPostImageUpload from "./NewPostImageUpload";
 import type { User } from "../types";
+import type { UploadFile } from 'antd/es/upload/interface';
 import { createNote } from "@dsnp/activity-content/factories";
 import { InternalUploadFile } from "antd/es/upload/interface";
 import * as dsnpLink from "../dsnpLink";
@@ -18,7 +19,7 @@ interface NewPostProps {
 type NewPostValues = {
   message: string;
   test: string;
-  images: Array<{ upload: { file: InternalUploadFile } }>
+  images: UploadFile[];
 };
 
 const NewPost = ({
@@ -36,13 +37,20 @@ const NewPost = ({
   };
 
   const createPost = async (formValues: NewPostValues) => {
-    console.log(formValues);
-    const note = createNote(formValues.message, new Date());
-    await dsnpLink.createBroadcast(dsnpLinkCtx, {}, note);
-    console.log("postActivityContentCreated", { note: note });
-    // await sendPost(userId, note);
-    // dispatch(postLoading({ loading: true, currentUserId: userId }));
-    success();
+    try {
+      console.log(formValues);
+      const body = new FormData();
+      body.append("content", formValues.message);
+      (formValues.images || []).forEach((upload) => {
+        if (upload.originFileObj) body.append("images", upload.originFileObj);
+      })
+      const resp = await dsnpLink.createBroadcast(dsnpLinkCtx, {}, body, { headers: {} });
+      console.log("postActivityContentCreated", { resp });
+      success();
+    } catch(e) {
+      console.error(e);
+      setSaving(false);
+    }
   };
 
   return (
