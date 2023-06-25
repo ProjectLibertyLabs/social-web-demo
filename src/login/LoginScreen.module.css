@@ -3,16 +3,14 @@
 }
 
 .root {
-    display: flex;
     justify-content: center;
-    flex-direction: column;
     background-color: var(--login-bg);
     border-radius: 10px;
     padding: 16px;
     display: flex;
     flex-direction: column;
     height: fit-content;
-    height: -moz-fit-content;
+    height: fit-content;
     margin-right: 15px;
 }
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import NewPost from "./content/NewPost";
 import PostList from "./content/PostList";
-import { Button } from "antd";
+import { Button, Spin } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { UserAccount, FeedTypes, User } from "./types";
 import styles from "./Feed.module.css";
@@ -12,6 +12,8 @@ type FeedProps = {
 
 const Feed = ({ account }: FeedProps): JSX.Element => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isPosting, setIsPosting] = useState<boolean>(false);
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(Date.now());
   const [feedType, setFeedType] = useState<FeedTypes>(FeedTypes.MY_FEED);
   const [showDisplayIdNav, setShowDisplayIdNav] = useState<boolean>(false);
   const [user, setUser] = useState<User>(account);
@@ -22,7 +24,7 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
 
   const feedNavClassName = (navItemType: FeedTypes) =>
     feedType === navItemType
-      ? [styles.navigationItem, styles['navigationItem--active']].join(" ")
+      ? [styles.navigationItem, styles["navigationItem--active"]].join(" ")
       : styles.navigationItem;
 
   const resetFeed = () => {
@@ -40,10 +42,7 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
         <nav className={styles.navigation}>
           {showDisplayIdNav && (
             <>
-              <div
-                className={styles.backArrow}
-                onClick={() => resetFeed()}
-              >
+              <div className={styles.backArrow} onClick={() => resetFeed()}>
                 <ArrowLeftOutlined />
               </div>
               <div
@@ -85,13 +84,25 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
         </Button>
         {isModalOpen && (
           <NewPost
-            onSuccess={() => setIsModalOpen(false)}
+            onSuccess={() => {
+              setIsModalOpen(false);
+              setIsPosting(true);
+              setTimeout(() => {
+                setRefreshTrigger(Date.now());
+                setIsPosting(false);
+              }, 12_000);
+            }}
             onCancel={() => setIsModalOpen(false)}
             account={account}
           />
         )}
       </div>
-      <PostList feedType={feedType} user={user} />
+      <Spin spinning={isPosting} size="large" />
+      <PostList
+        refreshTrigger={refreshTrigger}
+        feedType={feedType}
+        user={user}
+      />
     </div>
   );
 };

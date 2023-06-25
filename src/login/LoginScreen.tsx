@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Button, Select, Spin, Row, Col, Form } from "antd";
+import React, { useEffect, useState } from "react";
+import { Button, Spin, Row, Col, Form } from "antd";
 import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import MissingWallet from "./MissingWallet";
@@ -37,9 +37,18 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
   // Assume it has a wallet extension until after we have called enable
   const [hasWalletExtension, setHasWalletExtension] = useState(true);
   const [extensionConnected, setExtensionConnected] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedNetwork, setSelectedNetwork] = useState<string>("https://rpc.rococo.frequency.xyz");
+  const [isLoading, setIsLoading] = useState(true);
+  const [providerInfo, setProviderInfo] = useState<dsnpLink.ProviderResponse>();
   const [handlesMap, setHandlesMap] = useState<HandlesMap>(new Map());
+
+  useEffect(() => {
+    const getProviderInfo = async () => {
+      const fetched = await dsnpLink.authProvider(dsnpLinkCtx, {});
+      setProviderInfo(fetched);
+      setIsLoading(false);
+    };
+    getProviderInfo();
+  }, [setProviderInfo, setIsLoading]);
 
   const connectExtension = async () => {
     try {
@@ -69,10 +78,9 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
     }
   };
 
-  const handleNetworkChange = (value: string) => {
-    setSelectedNetwork(value);
-    // filter account list?
-  };
+  if (extensionConnected && !providerInfo) {
+    throw new Error("Unable to get connection to backend");
+  }
 
   return (
     <div className={styles.root}>
@@ -81,18 +89,6 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
           {!hasWalletExtension && !isLoading && <MissingWallet />}
           {hasWalletExtension && !extensionConnected && (
             <Form wrapperCol={{ span: 24 }} layout="vertical" size="large">
-              <Form.Item label="Select Network">
-                <Select<string>
-                  onChange={handleNetworkChange}
-                  placeholder="Select Network"
-                  defaultValue={selectedNetwork}
-                  options={[
-                    { value: "https://1.rpc.frequency.xyz", label: "Frequency Mainnet" },
-                    { value: "https://rpc.rococo.frequency.xyz", label: "Frequency Testnet" },
-                    { value: "http://localhost:9944", label: "Local Frequency" },
-                  ]}
-                />
-              </Form.Item>
               <Form.Item label="">
                 <Button type="primary" onClick={connectExtension}>
                   Connect to Polkadot.js Extension
@@ -100,13 +96,21 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
               </Form.Item>
             </Form>
           )}
-          {extensionConnected && (
+          {extensionConnected && providerInfo && (
             <>
               <Col span={12}>
-                <Login onLogin={onLogin} selectedNetwork={selectedNetwork} handlesMap={handlesMap} />
+                <Login
+                  onLogin={onLogin}
+                  selectedNetwork={providerInfo.nodeUrl}
+                  handlesMap={handlesMap}
+                />
               </Col>
               <Col span={12}>
-                <CreateIdentity onLogin={onLogin} selectedNetwork={selectedNetwork} handlesMap={handlesMap} />
+                <CreateIdentity
+                  onLogin={onLogin}
+                  providerInfo={providerInfo}
+                  handlesMap={handlesMap}
+                />
               </Col>
             </>
           )}

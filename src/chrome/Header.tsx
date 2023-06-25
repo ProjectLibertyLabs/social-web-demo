@@ -14,15 +14,19 @@ type HeaderProps = {
 const Header = ({ account, logout }: HeaderProps): JSX.Element => {
   return (
     <div className={styles.root}>
-      <Title level={1} className={styles.title}>Social Web Demo</Title>
-      {account && logout && <Popover
-        placement="bottomRight"
-        trigger="click"
-        content={<UserMenu logout={logout} />}
-      >
-        <UserAvatar user={account} avatarSize="small" />
-        <div>{account.handle}</div>
-      </Popover>}
+      <Title level={1} className={styles.title}>
+        Social Web Demo
+      </Title>
+      {account && logout && (
+        <Popover
+          placement="bottomRight"
+          trigger="click"
+          content={<UserMenu logout={logout} />}
+        >
+          <UserAvatar user={account} avatarSize="small" />
+          <div>{account.handle}</div>
+        </Popover>
+      )}
     </div>
   );
 };

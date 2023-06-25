@@ -6,8 +6,7 @@ import * as dsnpLink from "../dsnpLink";
 import { HandlesMap, UserAccount } from "../types";
 import { signPayloadWithExtension } from "./signing";
 import styles from "./Login.module.css";
-
-const dsnpLinkCtx = dsnpLink.createContext();
+import { getContext } from "../service/AuthService";
 
 interface LoginProps {
   handlesMap: HandlesMap;
@@ -23,7 +22,6 @@ const Login = ({
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
-
   const handleLogin = async () => {
     if (!selectedAccount) return;
     const handle = handlesMap.get(selectedAccount)?.handle;
@@ -31,15 +29,19 @@ const Login = ({
     setIsLoading(true);
 
     try {
+      const dsnpLinkCtx = getContext();
       const { challenge } = await dsnpLink.authChallenge(dsnpLinkCtx, {});
 
-      const signedChallenge = await signPayloadWithExtension(selectedAccount, challenge)
+      const signedChallenge = await signPayloadWithExtension(
+        selectedAccount,
+        challenge
+      );
 
       if (!signedChallenge.startsWith("0x")) {
         throw Error("Unable to sign: " + signedChallenge);
       }
 
-      const { accessToken, expiresIn, dsnpId } = await dsnpLink.authLogin(
+      const { accessToken, expires, dsnpId } = await dsnpLink.authLogin(
         dsnpLinkCtx,
         {},
         {
@@ -47,16 +49,20 @@ const Login = ({
           encoding: "base58",
           encodedValue: signedChallenge,
           publicKey: selectedAccount,
+          challenge,
         }
       );
-      onLogin({
-        address: selectedAccount,
-        handle,
-        accessToken,
-        expiresIn,
-        dsnpId,
-      }, selectedNetwork);
-    } catch(e) {
+      onLogin(
+        {
+          address: selectedAccount,
+          handle,
+          accessToken,
+          expires,
+          dsnpId,
+        },
+        selectedNetwork
+      );
+    } catch (e) {
       console.error(e);
       setIsLoading(false);
     }
@@ -92,7 +98,8 @@ const Login = ({
           </Spin>
         </Form>
       </div>
-    </div>)
-}
+    </div>
+  );
+};
 
 export default Login;

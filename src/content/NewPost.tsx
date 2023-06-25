@@ -3,12 +3,9 @@ import { Button, Modal, Input, Form } from "antd";
 import UserAvatar from "../chrome/UserAvatar";
 import NewPostImageUpload from "./NewPostImageUpload";
 import type { User } from "../types";
-import type { UploadFile } from 'antd/es/upload/interface';
-import { createNote } from "@dsnp/activity-content/factories";
-import { InternalUploadFile } from "antd/es/upload/interface";
+import type { UploadFile } from "antd/es/upload/interface";
 import * as dsnpLink from "../dsnpLink";
-
-const dsnpLinkCtx = dsnpLink.createContext();
+import { getContext } from "../service/AuthService";
 
 interface NewPostProps {
   onSuccess: () => void;
@@ -30,7 +27,6 @@ const NewPost = ({
   const [form] = Form.useForm();
   const [saving, setSaving] = React.useState<boolean>(false);
 
-
   const success = () => {
     setSaving(false);
     onSuccess();
@@ -43,11 +39,13 @@ const NewPost = ({
       body.append("content", formValues.message);
       (formValues.images || []).forEach((upload) => {
         if (upload.originFileObj) body.append("images", upload.originFileObj);
-      })
-      const resp = await dsnpLink.createBroadcast(dsnpLinkCtx, {}, body, { headers: {} });
+      });
+      const resp = await dsnpLink.createBroadcast(getContext(), {}, body, {
+        headers: {},
+      });
       console.log("postActivityContentCreated", { resp });
       success();
-    } catch(e) {
+    } catch (e) {
       console.error(e);
       setSaving(false);
     }
@@ -69,10 +67,12 @@ const NewPost = ({
         <Form.Item name="message" required={true}>
           <Input.TextArea rows={4} placeholder="Enter your message" />
         </Form.Item>
-        <NewPostImageUpload onChange={(fileList) => {
-          form.setFieldsValue({ images: fileList });
-          form.validateFields(['images']);
-        }} />
+        <NewPostImageUpload
+          onChange={(fileList) => {
+            form.setFieldsValue({ images: fileList });
+            form.validateFields(["images"]);
+          }}
+        />
         <Form.Item>
           <Button type="primary" htmlType="submit" loading={saving}>
             Post

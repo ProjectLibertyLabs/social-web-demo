@@ -7,13 +7,13 @@ const Registry = new TypeRegistry();
 Registry.register({
   ClaimHandle: {
     baseHandle: "Bytes",
-    expiration: "u32"
+    expiration: "u32",
   },
   AddProvider: {
-    authorizedMsaId: 'u64',
-    schemaIds: 'Vec<u16>',
-    expiration: "u32"
-  }
+    authorizedMsaId: "u64",
+    schemaIds: "Vec<u16>",
+    expiration: "u32",
+  },
 });
 
 export async function signPayloadWithExtension(
@@ -48,14 +48,19 @@ export const payloadHandle = (expiration: number, handle: string) => {
   });
 
   return claimHandlePayload;
-}
+};
 
-export const payloadAddProvider = (expiration: number, providerId: number, schemaIds: number[]) => {
+export const payloadAddProvider = (
+  expiration: number,
+  providerId: string,
+  schemaIds: number[]
+) => {
+  schemaIds.sort();
   const claimHandlePayload = Registry.createType("AddProvider", {
     authorizedMsaId: providerId,
-    schemaIds,
     expiration,
+    schemaIds,
   });
 
   return claimHandlePayload;
-}
+};

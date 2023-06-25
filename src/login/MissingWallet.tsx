@@ -10,7 +10,9 @@ const MissingWallet = (): JSX.Element => {
         To use this application, you need to install the Polkadot.js browser
         extension.
       </Paragraph>
-      <Paragraph>Please follow the steps below to install the extension:</Paragraph>
+      <Paragraph>
+        Please follow the steps below to install the extension:
+      </Paragraph>
       <ol>
         <li>Open the Chrome or Firefox web browser.</li>
         <li>Go to the Polkadot.js Extension page:</li>

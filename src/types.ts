@@ -3,13 +3,13 @@ import type { U8aLike } from "@polkadot/util/types";
 
 export type UserAccount = {
   address: string;
-  expiresIn: number;
+  expires: number;
   accessToken: string;
 } & User;
 
 export type User = {
   handle: string;
-  dsnpId: number;
+  dsnpId: string;
   profile?: {
     icon: string;
     name: string;

@@ -8,7 +8,7 @@ import type { MenuProps } from "antd";
 
 interface PostHashDropdownProps {
   hash: HexString;
-  fromId: number;
+  fromId: string;
   isReply?: boolean;
 }
 

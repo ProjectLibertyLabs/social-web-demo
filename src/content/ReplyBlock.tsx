@@ -12,7 +12,7 @@ interface isReplyLoadingType {
 interface ReplyBlockProps {
   parentURI: DSNPContentURI;
   replies: dsnpLink.ReplyExtended[];
-  goToProfile: (dsnpId: number) => void;
+  goToProfile: (dsnpId: string) => void;
   showReplyInput: boolean;
 }
 
@@ -38,7 +38,7 @@ const ReplyBlock = ({
           </>
         )}
       </div>
-      (showReplyInput && <ReplyInput parentURI={parentURI} />)
+      {showReplyInput && <ReplyInput parentURI={parentURI} />}
     </>
   );
 };

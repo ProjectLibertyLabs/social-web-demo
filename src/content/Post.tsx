@@ -21,7 +21,7 @@ type FeedItem = dsnpLink.BroadcastExtended;
 
 type PostProps = {
   feedItem: FeedItem;
-  goToProfile: (dsnpId: number) => void;
+  goToProfile: (dsnpId: string) => void;
   showReplyInput: boolean;
 };
 

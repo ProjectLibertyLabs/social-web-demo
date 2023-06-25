@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { ActivityContentProfile } from "@dsnp/activity-content/types";
 import * as dsnpLink from "../dsnpLink";
 import { User } from "../types";
+import { getContext } from "./AuthService";
 
-const dsnpLinkCtx = dsnpLink.createContext();
-const profileCache: Map<number, Promise<User>> = new Map();
+const profileCache: Map<string, Promise<User>> = new Map();
 
 const profileToUser = (profile: dsnpLink.Profile): User => {
   let userProfile: User["profile"] | undefined = undefined;
@@ -22,7 +22,7 @@ const profileToUser = (profile: dsnpLink.Profile): User => {
   };
 };
 
-export const getUserProfile = (dsnpId: number): Promise<User | null> => {
+export const getUserProfile = (dsnpId: string): Promise<User | null> => {
   // Check if the profile is already cached
   const cached = profileCache.get(dsnpId);
   if (cached) return cached;
@@ -30,7 +30,7 @@ export const getUserProfile = (dsnpId: number): Promise<User | null> => {
   // Profile not found in cache, fetch from the server
   try {
     const profile = dsnpLink
-      .getProfile(dsnpLinkCtx, { dsnpId })
+      .getProfile(getContext(), { dsnpId })
       .then(profileToUser);
     profileCache.set(dsnpId, profile);
     return profile;
@@ -40,10 +40,10 @@ export const getUserProfile = (dsnpId: number): Promise<User | null> => {
   }
 };
 
-const loadingUser = { handle: "Loading", dsnpId: 0 };
+const loadingUser = { handle: "Loading", dsnpId: "" };
 
 type UseGetUserResp = { user: User; isLoading: boolean; error: string };
-export const useGetUser = (dsnpId: number): UseGetUserResp => {
+export const useGetUser = (dsnpId: string): UseGetUserResp => {
   const [user, setUser] = useState<User>(loadingUser);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -54,7 +54,7 @@ export const useGetUser = (dsnpId: number): UseGetUserResp => {
         if (resp === null) {
           setUser({
             handle: "unknown",
-            dsnpId: 0,
+            dsnpId: "",
           });
           setError("Unknown User");
         } else {
