@@ -9,7 +9,7 @@ export type ChallengeResponse = {
 };
 export type LoginRequest = {
   algo: "SR25519";
-  encoding: "base16" | "base58";
+  encoding: "hex";
   encodedValue: string;
   publicKey: string;
   challenge: string;
@@ -23,7 +23,7 @@ export type CreateIdentityRequest = {
   addProviderSignature: string;
   algo: "SR25519";
   baseHandle: string;
-  encoding: "base16" | "base58";
+  encoding: "hex";
   expiration: number;
   handleSignature: string;
   publicKey: string;
@@ -38,7 +38,7 @@ export type AuthAccountResponse = {
 };
 export type DelegateRequest = {
   algo: "SR25519";
-  encoding: "base16" | "base58";
+  encoding: "hex";
   encodedValue: string;
   publicKey: string;
 };

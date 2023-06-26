@@ -76,7 +76,7 @@ const CreateIdentity = ({
           {},
           {
             algo: "SR25519",
-            encoding: "base58",
+            encoding: "hex",
             expiration,
             baseHandle: handle,
             publicKey: signingAccount.account.address,

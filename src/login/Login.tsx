@@ -46,7 +46,7 @@ const Login = ({
         {},
         {
           algo: "SR25519",
-          encoding: "base58",
+          encoding: "hex",
           encodedValue: signedChallenge,
           publicKey: selectedAccount,
           challenge,
