@@ -34,15 +34,12 @@ const NewPost = ({
 
   const createPost = async (formValues: NewPostValues) => {
     try {
-      console.log(formValues);
       const body = new FormData();
       body.append("content", formValues.message);
       (formValues.images || []).forEach((upload) => {
         if (upload.originFileObj) body.append("images", upload.originFileObj);
       });
-      const resp = await dsnpLink.createBroadcast(getContext(), {}, body, {
-        headers: {},
-      });
+      const resp = await dsnpLink.createBroadcast(getContext(), {}, body);
       console.log("postActivityContentCreated", { resp });
       success();
     } catch (e) {
