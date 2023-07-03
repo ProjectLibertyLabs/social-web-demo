@@ -23,19 +23,16 @@ const App = (): JSX.Element => {
     undefined,
     "user-account"
   );
-  const [selectedNetwork, setSelectedNetwork] = useStickyState<
-    string | undefined
-  >(undefined, "selected-network");
 
-  const handleLogin = (account: UserAccount, network: string) => {
+  if (userAccount) setAccessToken(userAccount.accessToken, userAccount.expires);
+
+  const handleLogin = (account: UserAccount, _network: string) => {
     setAccessToken(account.accessToken, account.expires);
     setUserAccount(account);
-    setSelectedNetwork(network);
   };
 
   const handleLogout = () => {
     setUserAccount(undefined);
-    setSelectedNetwork(undefined);
   };
 
   return (

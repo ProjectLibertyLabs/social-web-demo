@@ -74,7 +74,7 @@ const Login = ({
 
   return (
     <div className={styles.root}>
-      <Title level={2}>Create Social Web Identity</Title>
+      <Title level={2}>Use Existing Social Web Identity</Title>
       <div>
         <Form layout="vertical" size="large">
           <Spin tip="Loading" size="large" spinning={isLoading}>
