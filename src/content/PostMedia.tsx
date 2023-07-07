@@ -1,7 +1,7 @@
 import React from "react";
 import ReactPlayer from "react-player";
 import { Carousel } from "antd";
-import { RightOutlined, LeftOutlined } from "@ant-design/icons";
+// import { RightOutlined, LeftOutlined } from "@ant-design/icons";
 import type {
   ActivityContentAttachment,
   ActivityContentImage,
@@ -67,8 +67,9 @@ const PostMedia = ({ attachments }: PostMediaProps): JSX.Element => {
 
   return (
     <Carousel
-      nextArrow={<RightOutlined />}
-      prevArrow={<LeftOutlined />}
+      dotPosition="top"
+      // nextArrow={<RightOutlined />}
+      // prevArrow={<LeftOutlined />}
       dots={true}
     >
       {getPostMediaItems()}

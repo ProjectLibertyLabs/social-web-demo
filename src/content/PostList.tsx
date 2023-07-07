@@ -6,6 +6,7 @@ import Post from "./Post";
 import * as dsnpLink from "../dsnpLink";
 import { User, FeedTypes } from "../types";
 import { getContext } from "../service/AuthService";
+import styles from "./Post.module.css";
 
 type PostListProps = {
   feedType: FeedTypes;
@@ -33,7 +34,10 @@ const PostList = ({
 
   const [currentFeed, setCurrentFeed] = React.useState<FeedItem[]>([]);
 
-  const postGetPosts = (result: dsnpLink.PaginatedBroadcast, appendOrPrepend: "append" | "prepend") => {
+  const postGetPosts = (
+    result: dsnpLink.PaginatedBroadcast,
+    appendOrPrepend: "append" | "prepend"
+  ) => {
     setOldestBlockNumber(
       Math.min(
         oldestBlockNumber || result.oldestBlockNumber,
@@ -70,16 +74,27 @@ const PostList = ({
     });
     const params = {
       // Going back in time should be undefined, but forward starts at the oldest
-      oldestBlockNumber: getOlder ? undefined : (newestBlockNumber ? newestBlockNumber + 1 : undefined),
+      oldestBlockNumber: getOlder
+        ? undefined
+        : newestBlockNumber
+        ? newestBlockNumber + 1
+        : undefined,
       // Going back in time should start at our oldest, but going forward is undefined
-      newestBlockNumber: getOlder ? (oldestBlockNumber ? oldestBlockNumber - 1 : undefined) : undefined,
+      newestBlockNumber: getOlder
+        ? oldestBlockNumber
+          ? oldestBlockNumber - 1
+          : undefined
+        : undefined,
     };
     setPriorTrigger(refreshTrigger);
     setIsLoading(true);
     const appendOrPrepend = getOlder ? "append" : "prepend";
     switch (feedType) {
       case FeedTypes.MY_FEED:
-        postGetPosts(await dsnpLink.getFeed(getContext(), params), appendOrPrepend);
+        postGetPosts(
+          await dsnpLink.getFeed(getContext(), params),
+          appendOrPrepend
+        );
         return;
       case FeedTypes.DISPLAY_ID_POSTS:
         postGetPosts(
@@ -87,7 +102,8 @@ const PostList = ({
             dsnpId: user.dsnpId,
             ...params,
           }),
-          appendOrPrepend);
+          appendOrPrepend
+        );
         return;
     }
   };
@@ -95,7 +111,7 @@ const PostList = ({
   const hasMore = oldestBlockNumber ? oldestBlockNumber > 1 : true;
 
   return (
-    <div className="PostList__block">
+    <div className={styles.root}>
       {isLoading && <BlankPost />}
       {oldestBlockNumber !== undefined && currentFeed.length > 0 ? (
         <InfiniteScroll

@@ -3,6 +3,7 @@ import ReplyInput from "./ReplyInput";
 import * as dsnpLink from "../dsnpLink";
 import { DSNPContentURI } from "../helpers/dsnp";
 import Post from "./Post";
+import styles from "./ReplyBlock.module.css";
 
 interface isReplyLoadingType {
   loading: boolean;
@@ -24,7 +25,7 @@ const ReplyBlock = ({
 }: ReplyBlockProps): JSX.Element => {
   return (
     <>
-      <div className="ReplyBlock__repliesList">
+      <div className={styles.root}>
         {replies.length > 0 && (
           <>
             {replies.map((reply, index) => (

@@ -8,8 +8,10 @@ import * as dsnpLink from "./dsnpLink";
 import { UserAccount } from "./types";
 import Header from "./chrome/Header";
 import Feed from "./Feed";
-import { Col, ConfigProvider, Row } from "antd";
+import { Col, ConfigProvider, Layout, Row, Slider } from "antd";
 import { setAccessToken } from "./service/AuthService";
+import ConnectionsList from "./network/ConnectionsList";
+import { Content } from "antd/es/layout/layout";
 
 const App = (): JSX.Element => {
   const _fakeUser = {
@@ -46,25 +48,29 @@ const App = (): JSX.Element => {
         },
       }}
     >
-      <div className={styles.root}>
-        <Row>
-          <Col span={24}>
-            <Header account={userAccount} logout={handleLogout} />
-          </Col>
-        </Row>
-        <Row className={styles.content}>
-          <Col span={12}>
-            {!userAccount ? (
-              <LoginScreen onLogin={handleLogin} />
-            ) : (
-              <Feed account={userAccount} />
-            )}
-          </Col>
-          <Col span={12}>
-
-          </Col>
-        </Row>
-      </div>
+      <Layout className={styles.root}>
+        <Header account={userAccount} logout={handleLogout} />
+        {!userAccount && (
+          <Content className={styles.content}>
+            <LoginScreen onLogin={handleLogin} />
+          </Content>
+        )}
+        {userAccount && (
+          <Content className={styles.content}>
+            <Row>
+              <Col sm={24} md={12} lg={24 - 8}>
+                <Feed account={userAccount} />
+              </Col>
+              <Col sm={24} md={12} lg={8}>
+                <ConnectionsList
+                  account={userAccount}
+                  graphRootUser={userAccount}
+                />
+              </Col>
+            </Row>
+          </Content>
+        )}
+      </Layout>
     </ConfigProvider>
   );
 };

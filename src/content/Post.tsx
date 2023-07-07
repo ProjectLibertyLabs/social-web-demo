@@ -16,6 +16,7 @@ import { Anchorme } from "react-anchorme";
 import * as dsnpLink from "../dsnpLink";
 import { useGetUser } from "../service/UserProfileService";
 import { buildDSNPContentURI } from "../helpers/dsnp";
+import styles from "./Post.module.css";
 
 type FeedItem = dsnpLink.BroadcastExtended;
 
@@ -41,7 +42,7 @@ const Post = ({
   const attachments: ActivityContentAttachment[] = content.attachment || [];
 
   return (
-    <Card key={feedItem.contentHash} className="Post__block" bordered={false}>
+    <Card key={feedItem.contentHash} className={styles.root} bordered={false}>
       <Spin tip="Loading" size="large" spinning={isLoading}>
         <div
           onClick={() => goToProfile(feedItem.fromId)}

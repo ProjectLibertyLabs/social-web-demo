@@ -28,3 +28,9 @@ export enum FeedTypes {
 }
 
 export type HexString = string;
+
+export enum RelationshipStatus {
+  FOLLOWING,
+  UNFOLLOWING,
+  UPDATING,
+}

@@ -1,0 +1,13 @@
+:root {
+    --connections-bg: white;
+}
+
+.root {
+  background-color: var(--connections-bg);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  margin-right: 15px;
+}

@@ -1,0 +1,7 @@
+.profile {
+  display: flex;
+}
+
+.name {
+  display: inline;
+}
