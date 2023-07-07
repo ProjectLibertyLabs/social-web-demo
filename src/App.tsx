@@ -53,12 +53,15 @@ const App = (): JSX.Element => {
           </Col>
         </Row>
         <Row className={styles.content}>
-          <Col span={24}>
+          <Col span={12}>
             {!userAccount ? (
               <LoginScreen onLogin={handleLogin} />
             ) : (
               <Feed account={userAccount} />
             )}
+          </Col>
+          <Col span={12}>
+
           </Col>
         </Row>
       </div>
