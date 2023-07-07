@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Card, Spin } from "antd";
-import { HexString, User } from "../types";
 import UserAvatar from "../chrome/UserAvatar";
 import PostMedia from "./PostMedia";
 import RelativeTime from "../helpers/RelativeTime";
@@ -11,7 +10,6 @@ import {
   ActivityContentNote,
   ActivityContentAttachment,
 } from "@dsnp/activity-content/types";
-// import { buildDSNPAnnouncementURI } from "@dsnp/sdk/core/identifiers";
 import { Anchorme } from "react-anchorme";
 import * as dsnpLink from "../dsnpLink";
 import { useGetUser } from "../service/UserProfileService";
@@ -48,17 +46,17 @@ const Post = ({
           onClick={() => goToProfile(feedItem.fromId)}
           onMouseEnter={() => setIsHoveringProfile(true)}
           onMouseLeave={() => setIsHoveringProfile(false)}
-          className="Post__metaBlock"
+          className={styles.metaBlock}
         >
           <Card.Meta
-            className="Post__metaInnerBlock"
+            className={styles.metaInnerBlock}
             avatar={<UserAvatar user={user} avatarSize={"medium"} />}
             title={
               <FromTitle user={user} isHoveringProfile={isHoveringProfile} />
             }
           />
         </div>
-        <div className="Post__rightCorner">
+        <div className={styles.time}>
           {content?.published && (
             <RelativeTime published={content?.published} postStyle={true} />
           )}
@@ -69,7 +67,7 @@ const Post = ({
         </div>
         <>
           {content && (
-            <div className="Post__caption">
+            <div className={styles.caption}>
               <Anchorme target="_blank" rel="noreferrer noopener">
                 {content?.content}
               </Anchorme>
