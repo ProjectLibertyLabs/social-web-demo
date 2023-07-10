@@ -6,7 +6,7 @@
     }
   ],
   "info": {
-    "title": "DSNP Link API Documentation",
+    "title": "DSNP Gateway Prototype API Documentation",
     "version": "1.0.0"
   },
   "paths": {
@@ -269,6 +269,48 @@
       "get": {
         "operationId": "getFeed",
         "summary": "Get the Feed for the current user, paginated",
+        "security": [{
+          "tokenAuth": []
+        }],
+        "parameters": [
+          {
+            "name": "newestBlockNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "oldestBlockNumber",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "$ref": "#/components/responses/UnauthorizedError"
+          },
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaginatedBroadcast"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/content/discover": {
+      "get": {
+        "operationId": "getDiscover",
+        "summary": "Get the Discovery Feed for the current user, paginated",
         "security": [{
           "tokenAuth": []
         }],

@@ -1,18 +1,20 @@
 import React, { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Title from "antd/es/typography/Title";
-import BlankPost from "./BlankPost";
 import Post from "./Post";
 import * as dsnpLink from "../dsnpLink";
 import { User, FeedTypes } from "../types";
 import { getContext } from "../service/AuthService";
 import styles from "./Post.module.css";
+import { Spin } from "antd";
 
 type PostListProps = {
   feedType: FeedTypes;
-  user: User;
+  user: User | undefined;
   // Uses Date.now to trigger an update
   refreshTrigger: number;
+  goToProfile: (dsnpId: string) => void;
+  resetFeed: () => void;
 };
 
 type FeedItem = dsnpLink.BroadcastExtended;
@@ -21,9 +23,13 @@ const PostList = ({
   feedType,
   user,
   refreshTrigger,
+  goToProfile,
+  resetFeed,
 }: PostListProps): JSX.Element => {
   const [priorTrigger, setPriorTrigger] =
     React.useState<number>(refreshTrigger);
+  const [priorFeedType, setPriorFeedType] =
+    React.useState<number>(feedType);
   const [newestBlockNumber, setNewestBlockNumber] = React.useState<
     number | undefined
   >(undefined);
@@ -31,12 +37,12 @@ const PostList = ({
     number | undefined
   >(undefined);
   const [isLoading, setIsLoading] = React.useState(true);
-
   const [currentFeed, setCurrentFeed] = React.useState<FeedItem[]>([]);
 
   const postGetPosts = (
     result: dsnpLink.PaginatedBroadcast,
-    appendOrPrepend: "append" | "prepend"
+    appendOrPrepend: "append" | "prepend",
+    priorFeed: FeedItem[]
   ) => {
     setOldestBlockNumber(
       Math.min(
@@ -51,28 +57,22 @@ const PostList = ({
       )
     );
     if (appendOrPrepend === "append") {
-      setCurrentFeed([...currentFeed, ...result.posts]);
+      setCurrentFeed([...priorFeed, ...result.posts]);
     } else {
-      setCurrentFeed([...result.posts, ...currentFeed]);
+      setCurrentFeed([...result.posts, ...priorFeed]);
     }
     setIsLoading(false);
   };
 
   useEffect(() => {
-    console.log("useEffect", {
-      feedType,
-      user,
-      refreshTrigger,
-    });
     const getOlder = refreshTrigger === priorTrigger;
     fetchData(getOlder);
   }, [feedType, user, refreshTrigger]);
 
   const fetchData = async (getOlder: boolean) => {
-    console.log("fetchData", {
-      getOlder,
-    });
-    const params = {
+    const isAddingMore = priorFeedType === feedType;
+
+    const params = !isAddingMore ? {} : {
       // Going back in time should be undefined, but forward starts at the oldest
       oldestBlockNumber: getOlder
         ? undefined
@@ -86,23 +86,37 @@ const PostList = ({
           : undefined
         : undefined,
     };
+
+    const priorFeed = priorFeedType === feedType ? currentFeed : [];
     setPriorTrigger(refreshTrigger);
+    setPriorFeedType(feedType);
     setIsLoading(true);
     const appendOrPrepend = getOlder ? "append" : "prepend";
     switch (feedType) {
       case FeedTypes.MY_FEED:
         postGetPosts(
           await dsnpLink.getFeed(getContext(), params),
-          appendOrPrepend
+          appendOrPrepend,
+          priorFeed,
+        );
+        return;
+      case FeedTypes.DISCOVER:
+        postGetPosts(
+          await dsnpLink.getDiscover(getContext(), params),
+          appendOrPrepend,
+          priorFeed,
         );
         return;
       case FeedTypes.DISPLAY_ID_POSTS:
+      case FeedTypes.MY_POSTS:
+        if (!user) return resetFeed();
         postGetPosts(
           await dsnpLink.getUserFeed(getContext(), {
             dsnpId: user.dsnpId,
             ...params,
           }),
-          appendOrPrepend
+          appendOrPrepend,
+          priorFeed,
         );
         return;
     }
@@ -112,7 +126,7 @@ const PostList = ({
 
   return (
     <div className={styles.root}>
-      {isLoading && <BlankPost />}
+      {isLoading && <Spin size="large" spinning={true} />}
       {oldestBlockNumber !== undefined && currentFeed.length > 0 ? (
         <InfiniteScroll
           dataLength={currentFeed.length + (hasMore ? 1 : 0)}
@@ -128,7 +142,7 @@ const PostList = ({
               key={index}
               feedItem={feedItem}
               showReplyInput={true}
-              goToProfile={() => {}}
+              goToProfile={goToProfile}
             />
           ))}
         </InfiniteScroll>

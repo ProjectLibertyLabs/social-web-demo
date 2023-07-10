@@ -1,64 +1,49 @@
 import React from "react";
-import { Button, Spin } from "antd";
+import { Button } from "antd";
+import styles from "./GraphChangeButton.module.css";
 import * as dsnpLink from "../dsnpLink";
-import { RelationshipStatus, User, UserAccount } from "../types";
+import { RelationshipStatus, User } from "../types";
 import { getContext } from "../service/AuthService";
 
-interface FollowButtonProps {
-  account: UserAccount;
+interface GraphChangeButtonProps {
   user: User;
   initialRelationshipStatus: RelationshipStatus;
 }
 
 const GraphChangeButton = ({
-  account,
   user,
   initialRelationshipStatus,
-}: FollowButtonProps): JSX.Element => {
+}: GraphChangeButtonProps): JSX.Element => {
   const [relationshipStatus, setRelationshipStatus] =
     React.useState<RelationshipStatus>(initialRelationshipStatus);
 
-  const isFollowing = (): boolean =>
-    [RelationshipStatus.FOLLOWING, RelationshipStatus.UPDATING].includes(
-      relationshipStatus
-    );
+  const isFollowing = relationshipStatus === RelationshipStatus.FOLLOWING;
 
-  const isFollowingUpdating = (): boolean =>
-    relationshipStatus === RelationshipStatus.UPDATING;
+  const isFollowingUpdating = relationshipStatus === RelationshipStatus.UPDATING;
 
   const buttonText = (): string =>
-    isFollowingUpdating() ? "updating" : isFollowing() ? "Unfollow" : "Follow";
+    isFollowingUpdating ? "Updating" :
+    isFollowing ? "Unfollow"
+    : "Follow";
 
   const changeGraphState = async () => {
-    if (isFollowing()) {
+    setRelationshipStatus(RelationshipStatus.UPDATING);
+    if (isFollowing) {
       await dsnpLink.graphFollow(getContext(), { dsnpId: user.dsnpId });
     } else {
       await dsnpLink.graphUnfollow(getContext(), { dsnpId: user.dsnpId });
     }
-    setRelationshipStatus(RelationshipStatus.UPDATING);
   };
 
   return (
     <Button
-      className="GraphChangeButton"
+      className={styles.root}
       name={buttonText()}
+      size="small"
       onClick={() => changeGraphState()}
-      disabled={isFollowingUpdating()}
+      loading={isFollowingUpdating}
     >
       {buttonText()}
-      {isFollowingUpdating() ? (
-        <Spin></Spin>
-      ) : (
-        <div
-          className={
-            buttonText() === "Follow"
-              ? "GraphChangeButton__followIcon"
-              : "GraphChangeButton__unfollowIcon"
-          }
-        >
-          &#10005;
-        </div>
-      )}
     </Button>
   );
 };

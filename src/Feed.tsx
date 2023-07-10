@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import NewPost from "./content/NewPost";
 import PostList from "./content/PostList";
 import { Button, Spin } from "antd";
@@ -8,19 +8,25 @@ import styles from "./Feed.module.css";
 
 type FeedProps = {
   account: UserAccount;
+  user: User | undefined;
+  accountFollowing: string[];
+  goToProfile: (dsnpId: string) => void;
 };
 
-const Feed = ({ account }: FeedProps): JSX.Element => {
+const Feed = ({ account, user, accountFollowing, goToProfile }: FeedProps): JSX.Element => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(Date.now());
   const [feedType, setFeedType] = useState<FeedTypes>(FeedTypes.MY_FEED);
   const [showDisplayIdNav, setShowDisplayIdNav] = useState<boolean>(false);
-  const [user, setUser] = useState<User>(account);
 
-  // const user: types.User = displayId
-  //   ? users[displayId]
-  //   : { fromId: "unknown", blockNumber: 0, blockIndex: 0, batchIndex: 0 };
+  if (feedType === FeedTypes.DISPLAY_ID_POSTS && user?.dsnpId === account.dsnpId) {
+    setFeedType(FeedTypes.MY_POSTS);
+  }
+
+  if (feedType === FeedTypes.DISPLAY_ID_POSTS && !user) {
+    setFeedType(FeedTypes.MY_FEED);
+  }
 
   const feedNavClassName = (navItemType: FeedTypes) =>
     feedType === navItemType
@@ -32,25 +38,24 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
     setFeedType(FeedTypes.MY_FEED);
   };
 
-  // useEffect(() => {
-  //   showDisplayIdNav && setFeedType(FeedTypes.DISPLAY_ID_POSTS);
-  // }, [showDisplayIdNav, displayId]);
+  const showProfile = (dsnpId: string) => {
+    setFeedType(FeedTypes.DISPLAY_ID_POSTS);
+    goToProfile(dsnpId);
+  }
 
   return (
     <div className={styles.root}>
       <div className={styles.header}>
         <nav className={styles.navigation}>
-          {showDisplayIdNav && (
+          {user && feedType === FeedTypes.DISPLAY_ID_POSTS && (
             <>
               <div className={styles.backArrow} onClick={() => resetFeed()}>
                 <ArrowLeftOutlined />
               </div>
               <div
                 className={feedNavClassName(FeedTypes.DISPLAY_ID_POSTS)}
-                onClick={() => setFeedType(FeedTypes.DISPLAY_ID_POSTS)}
               >
-                {/* <UserName user={user} /> */}
-                TODO: Single User's Posts
+                @{user.handle}&nbsp;Posts
               </div>
               <div className={styles.navigationSpacer}></div>
             </>
@@ -70,10 +75,13 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
           </div>
           <div className={styles.navigationSpacer}></div>
           <div
-            className={feedNavClassName(FeedTypes.DISPLAY_ID_POSTS)}
-            onClick={() => setFeedType(FeedTypes.DISPLAY_ID_POSTS)}
+            className={feedNavClassName(FeedTypes.MY_POSTS)}
+            onClick={() => {
+              goToProfile(account.dsnpId);
+              setFeedType(FeedTypes.MY_POSTS);
+            }}
           >
-            TODO: My Posts
+            My Posts
           </div>
         </nav>
         <Button
@@ -102,6 +110,8 @@ const Feed = ({ account }: FeedProps): JSX.Element => {
         refreshTrigger={refreshTrigger}
         feedType={feedType}
         user={user}
+        goToProfile={showProfile}
+        resetFeed={resetFeed}
       />
     </div>
   );

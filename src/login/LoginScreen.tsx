@@ -87,7 +87,9 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
     <div className={styles.root}>
       <Spin tip="Loading" size="large" spinning={isLoading}>
         <Row className={styles.content}>
-          {!extensionConnected && !isLoading && <MissingWallet hasWalletExtension={hasWalletExtension} />}
+          {!extensionConnected && !isLoading && (
+            <MissingWallet hasWalletExtension={hasWalletExtension} />
+          )}
           {!isLoading && !extensionConnected && (
             <Col span={24}>
               <Space direction="horizontal" className={styles.connectButton}>

@@ -25,12 +25,13 @@ export enum FeedTypes {
   MY_FEED,
   DISCOVER,
   DISPLAY_ID_POSTS,
+  MY_POSTS,
 }
 
 export type HexString = string;
 
 export enum RelationshipStatus {
   FOLLOWING,
-  UNFOLLOWING,
+  NONE,
   UPDATING,
 }

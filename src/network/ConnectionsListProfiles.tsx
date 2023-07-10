@@ -7,14 +7,14 @@ import styles from "./ConnectionsListProfiles.module.css";
 
 interface ConnectionsListProfilesProps {
   account: UserAccount;
-  graphRootUser: User;
   connectionsList: User[];
+  accountFollowing: string[];
 }
 
 const ConnectionsListProfiles = ({
   account,
-  graphRootUser,
   connectionsList,
+  accountFollowing,
 }: ConnectionsListProfilesProps): JSX.Element => {
   return (
     <>
@@ -24,12 +24,17 @@ const ConnectionsListProfiles = ({
           <div className={styles.name}>
             <FromTitle user={user} />
           </div>
-          <GraphChangeButton
-            account={account}
-            user={user}
-            // TODO: Fix initial status
-            initialRelationshipStatus={RelationshipStatus.FOLLOWING}
-          />
+          {/* Skip change button for self */}
+          {user.dsnpId !== account.dsnpId && (
+            <GraphChangeButton
+              user={user}
+              initialRelationshipStatus={
+                accountFollowing.includes(user.dsnpId)
+                  ? RelationshipStatus.FOLLOWING
+                  : RelationshipStatus.NONE
+              }
+            />
+          )}
         </div>
       ))}
     </>

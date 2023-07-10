@@ -52,7 +52,7 @@ const Post = ({
             className={styles.metaInnerBlock}
             avatar={<UserAvatar user={user} avatarSize={"medium"} />}
             title={
-              <FromTitle user={user} isHoveringProfile={isHoveringProfile} />
+              <FromTitle user={user} goToProfile={goToProfile} />
             }
           />
         </div>

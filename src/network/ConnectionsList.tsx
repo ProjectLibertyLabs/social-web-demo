@@ -7,31 +7,29 @@ import Title from "antd/es/typography/Title";
 import * as dsnpLink from "../dsnpLink";
 import { getContext } from "../service/AuthService";
 
-enum ListStatus {
-  CLOSED = "CLOSED",
-  FOLLOWERS = "FOLLOWERS",
-  FOLLOWING = "FOLLOWING",
-}
-
 type ConnectionsListProps = {
   account: UserAccount;
+  accountFollowing: string[];
   graphRootUser: User;
 };
 
 const ConnectionsList = ({
   account,
   graphRootUser,
+  accountFollowing,
 }: ConnectionsListProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [connectionsList, setConnectionsList] = useState<User[]>([]);
 
   const fetchConnections = async () => {
     const ctx = getContext();
-    const resp = await dsnpLink.userFollowing(ctx, {
+
+    const accountFollowingList = await dsnpLink.userFollowing(ctx, {
       dsnpId: graphRootUser.dsnpId,
     });
+
     const list: User[] = await Promise.all(
-      resp.map((dsnpId) =>
+      accountFollowingList.map((dsnpId) =>
         dsnpLink
           .getProfile(ctx, { dsnpId })
           .then(({ displayHandle, fromId, content }) => {
@@ -67,8 +65,8 @@ const ConnectionsList = ({
         <Title level={2}>Following ({connectionsList.length})</Title>
         <ConnectionsListProfiles
           account={account}
-          graphRootUser={graphRootUser}
           connectionsList={connectionsList}
+          accountFollowing={accountFollowing}
         />
       </div>
     </Spin>
