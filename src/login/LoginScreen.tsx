@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Spin, Row, Col, Form } from "antd";
+import { Button, Spin, Row, Col, Form, Space } from "antd";
 import { web3Accounts, web3Enable } from "@polkadot/extension-dapp";
 import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import MissingWallet from "./MissingWallet";
@@ -45,7 +45,7 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
     const getProviderInfo = async () => {
       const fetched = await dsnpLink.authProvider(dsnpLinkCtx, {});
       setProviderInfo(fetched);
-      setIsLoading(false);
+      setTimeout(connectExtension, 1_000);
     };
     getProviderInfo();
   }, [setProviderInfo, setIsLoading]);
@@ -54,6 +54,7 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
     try {
       setIsLoading(true);
       const enabled = await web3Enable("Social Web Example Client");
+      setHasWalletExtension(true);
       if (enabled.length > 0) {
         const allAccounts = await web3Accounts();
         // Check each account for a handle.
@@ -67,10 +68,10 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
         setExtensionConnected(true);
         setIsLoading(false);
       } else {
-        throw new Error("Failed to connect to Wallet");
+        setIsLoading(false);
       }
     } catch (e) {
-      setHasWalletExtension(false);
+      setHasWalletExtension("web3" in globalThis);
       setHandlesMap(new Map());
       setExtensionConnected(false);
       setIsLoading(false);
@@ -86,15 +87,15 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
     <div className={styles.root}>
       <Spin tip="Loading" size="large" spinning={isLoading}>
         <Row className={styles.content}>
-          {!hasWalletExtension && !isLoading && <MissingWallet />}
-          {hasWalletExtension && !extensionConnected && (
-            <Form wrapperCol={{ span: 24 }} layout="vertical" size="large">
-              <Form.Item label="">
-                <Button type="primary" onClick={connectExtension}>
-                  Connect to Polkadot.js Extension
+          {!extensionConnected && !isLoading && <MissingWallet hasWalletExtension={hasWalletExtension} />}
+          {!isLoading && !extensionConnected && (
+            <Col span={24}>
+              <Space direction="horizontal" className={styles.connectButton}>
+                <Button size="large" type="primary" onClick={connectExtension}>
+                  Connect to Wallet Extension
                 </Button>
-              </Form.Item>
-            </Form>
+              </Space>
+            </Col>
           )}
           {extensionConnected && providerInfo && (
             <>

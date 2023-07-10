@@ -2,16 +2,23 @@ import React from "react";
 import Title from "antd/es/typography/Title";
 import Paragraph from "antd/es/typography/Paragraph";
 
-const MissingWallet = (): JSX.Element => {
+interface MissingWalletProps {
+  hasWalletExtension: boolean;
+}
+
+const MissingWallet = ({ hasWalletExtension }: MissingWalletProps): JSX.Element => {
+
   return (
     <div>
-      <Title level={2}>Polkadot.js Extension Not Detected</Title>
+      <Title level={2}>Wallet Extension {!hasWalletExtension && "Not Installed"}</Title>
       <Paragraph>
-        To use this application, you need to install the Polkadot.js browser
-        extension.
+        To use this application, you need to install and enable a Polkadot compatible browser extension.
       </Paragraph>
-      <Paragraph>
-        Please follow the steps below to install the extension:
+      {hasWalletExtension && (<Paragraph>
+        Please enable website access and try again.
+      </Paragraph>)}
+      {!hasWalletExtension && (<><Paragraph>
+        Please follow the steps below to install the Polkadot.js Extension:
       </Paragraph>
       <ol>
         <li>Open the Chrome or Firefox web browser.</li>
@@ -42,7 +49,7 @@ const MissingWallet = (): JSX.Element => {
           import an existing one.
         </li>
         <li>Return to this application and try connecting again.</li>
-      </ol>
+      </ol></>)}
     </div>
   );
 };

@@ -11,6 +11,7 @@
     flex-direction: column;
     height: fit-content;
     margin-right: 15px;
+    min-height: 100px;
 }
 
 .content {
@@ -18,4 +19,10 @@
     max-width: 1200px;
     padding: 0 10px;
     margin: 0 auto;
+}
+
+.connectButton {
+    width: 100%;
+    justify-content: center;
+    margin: 20px;
 }
