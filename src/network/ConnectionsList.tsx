@@ -36,7 +36,7 @@ const ConnectionsList = ({
           .getProfile(ctx, { dsnpId })
           .then(({ displayHandle, fromId, content }) => {
             try {
-              const profile = JSON.parse(content);
+              const profile = content ? JSON.parse(content) : {};
               return {
                 handle: displayHandle || "",
                 dsnpId: fromId,
@@ -65,12 +65,12 @@ const ConnectionsList = ({
     <Spin spinning={isLoading} tip="Loading" size="large">
       <div className={styles.root}>
         <Title level={2}>Following ({connectionsList.length})</Title>
+        <ConnectionsListProfiles
+          account={account}
+          graphRootUser={graphRootUser}
+          connectionsList={connectionsList}
+        />
       </div>
-      <ConnectionsListProfiles
-        account={account}
-        graphRootUser={graphRootUser}
-        connectionsList={connectionsList}
-      />
     </Spin>
   );
 };
