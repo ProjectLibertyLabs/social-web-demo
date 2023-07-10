@@ -19,12 +19,13 @@ const Header = ({ account, logout }: HeaderProps): JSX.Element => {
       </Title>
       {account && logout && (
         <Popover
+          className={styles.user}
           placement="bottomRight"
           trigger="click"
           content={<UserMenu logout={logout} />}
         >
           <UserAvatar user={account} avatarSize="small" />
-          <div>{account.handle}</div>
+          {account.handle}
         </Popover>
       )}
     </div>

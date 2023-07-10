@@ -71,7 +71,7 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
         setIsLoading(false);
       }
     } catch (e) {
-      setHasWalletExtension("web3" in globalThis);
+      setHasWalletExtension("web3" in window);
       setHandlesMap(new Map());
       setExtensionConnected(false);
       setIsLoading(false);

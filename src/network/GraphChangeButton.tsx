@@ -7,32 +7,30 @@ import { getContext } from "../service/AuthService";
 
 interface GraphChangeButtonProps {
   user: User;
-  initialRelationshipStatus: RelationshipStatus;
+  relationshipStatus: RelationshipStatus;
+  triggerGraphRefresh: () => void;
 }
 
 const GraphChangeButton = ({
   user,
-  initialRelationshipStatus,
+  relationshipStatus,
+  triggerGraphRefresh,
 }: GraphChangeButtonProps): JSX.Element => {
-  const [relationshipStatus, setRelationshipStatus] =
-    React.useState<RelationshipStatus>(initialRelationshipStatus);
+  const [isUpdating, setIsUpdating] = React.useState<boolean>(false);
 
   const isFollowing = relationshipStatus === RelationshipStatus.FOLLOWING;
 
-  const isFollowingUpdating = relationshipStatus === RelationshipStatus.UPDATING;
-
   const buttonText = (): string =>
-    isFollowingUpdating ? "Updating" :
-    isFollowing ? "Unfollow"
-    : "Follow";
+    isUpdating ? "Updating" : isFollowing ? "Unfollow" : "Follow";
 
   const changeGraphState = async () => {
-    setRelationshipStatus(RelationshipStatus.UPDATING);
+    setIsUpdating(true);
     if (isFollowing) {
-      await dsnpLink.graphFollow(getContext(), { dsnpId: user.dsnpId });
-    } else {
       await dsnpLink.graphUnfollow(getContext(), { dsnpId: user.dsnpId });
+    } else {
+      await dsnpLink.graphFollow(getContext(), { dsnpId: user.dsnpId });
     }
+    triggerGraphRefresh();
   };
 
   return (
@@ -40,8 +38,8 @@ const GraphChangeButton = ({
       className={styles.root}
       name={buttonText()}
       size="small"
-      onClick={() => changeGraphState()}
-      loading={isFollowingUpdating}
+      onClick={changeGraphState}
+      loading={isUpdating}
     >
       {buttonText()}
     </Button>

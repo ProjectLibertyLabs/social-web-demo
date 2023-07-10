@@ -20,7 +20,7 @@ type FeedItem = dsnpLink.BroadcastExtended;
 
 type PostProps = {
   feedItem: FeedItem;
-  goToProfile: (dsnpId: string) => void;
+  goToProfile: (dsnpId?: string) => void;
   showReplyInput: boolean;
 };
 
@@ -51,9 +51,7 @@ const Post = ({
           <Card.Meta
             className={styles.metaInnerBlock}
             avatar={<UserAvatar user={user} avatarSize={"medium"} />}
-            title={
-              <FromTitle user={user} goToProfile={goToProfile} />
-            }
+            title={<FromTitle user={user} goToProfile={goToProfile} />}
           />
         </div>
         <div className={styles.time}>

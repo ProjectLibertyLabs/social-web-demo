@@ -11,12 +11,16 @@ type ConnectionsListProps = {
   account: UserAccount;
   accountFollowing: string[];
   graphRootUser: User;
+  triggerGraphRefresh: () => void;
+  goToProfile: (dsnpId?: string) => void;
 };
 
 const ConnectionsList = ({
   account,
   graphRootUser,
   accountFollowing,
+  triggerGraphRefresh,
+  goToProfile,
 }: ConnectionsListProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [connectionsList, setConnectionsList] = useState<User[]>([]);
@@ -55,15 +59,19 @@ const ConnectionsList = ({
     setIsLoading(false);
   };
 
+  // Update again when accountFollowing changes.
   useEffect(() => {
     fetchConnections();
-  }, [graphRootUser]);
+  }, [graphRootUser, accountFollowing]);
 
   return (
     <Spin spinning={isLoading} tip="Loading" size="large">
       <div className={styles.root}>
-        <Title level={2}>Following ({connectionsList.length})</Title>
+        <Title level={3}>Following ({connectionsList.length})</Title>
         <ConnectionsListProfiles
+          goToProfile={goToProfile}
+          key={accountFollowing.length}
+          triggerGraphRefresh={triggerGraphRefresh}
           account={account}
           connectionsList={connectionsList}
           accountFollowing={accountFollowing}

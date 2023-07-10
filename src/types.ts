@@ -33,5 +33,4 @@ export type HexString = string;
 export enum RelationshipStatus {
   FOLLOWING,
   NONE,
-  UPDATING,
 }

@@ -13,7 +13,7 @@ type PostListProps = {
   user: User | undefined;
   // Uses Date.now to trigger an update
   refreshTrigger: number;
-  goToProfile: (dsnpId: string) => void;
+  goToProfile: (dsnpId?: string) => void;
   resetFeed: () => void;
 };
 
@@ -28,8 +28,7 @@ const PostList = ({
 }: PostListProps): JSX.Element => {
   const [priorTrigger, setPriorTrigger] =
     React.useState<number>(refreshTrigger);
-  const [priorFeedType, setPriorFeedType] =
-    React.useState<number>(feedType);
+  const [priorFeedType, setPriorFeedType] = React.useState<number>(feedType);
   const [newestBlockNumber, setNewestBlockNumber] = React.useState<
     number | undefined
   >(undefined);
@@ -72,20 +71,22 @@ const PostList = ({
   const fetchData = async (getOlder: boolean) => {
     const isAddingMore = priorFeedType === feedType;
 
-    const params = !isAddingMore ? {} : {
-      // Going back in time should be undefined, but forward starts at the oldest
-      oldestBlockNumber: getOlder
-        ? undefined
-        : newestBlockNumber
-        ? newestBlockNumber + 1
-        : undefined,
-      // Going back in time should start at our oldest, but going forward is undefined
-      newestBlockNumber: getOlder
-        ? oldestBlockNumber
-          ? oldestBlockNumber - 1
-          : undefined
-        : undefined,
-    };
+    const params = !isAddingMore
+      ? {}
+      : {
+          // Going back in time should be undefined, but forward starts at the oldest
+          oldestBlockNumber: getOlder
+            ? undefined
+            : newestBlockNumber
+            ? newestBlockNumber + 1
+            : undefined,
+          // Going back in time should start at our oldest, but going forward is undefined
+          newestBlockNumber: getOlder
+            ? oldestBlockNumber
+              ? oldestBlockNumber - 1
+              : undefined
+            : undefined,
+        };
 
     const priorFeed = priorFeedType === feedType ? currentFeed : [];
     setPriorTrigger(refreshTrigger);
@@ -97,14 +98,14 @@ const PostList = ({
         postGetPosts(
           await dsnpLink.getFeed(getContext(), params),
           appendOrPrepend,
-          priorFeed,
+          priorFeed
         );
         return;
       case FeedTypes.DISCOVER:
         postGetPosts(
           await dsnpLink.getDiscover(getContext(), params),
           appendOrPrepend,
-          priorFeed,
+          priorFeed
         );
         return;
       case FeedTypes.DISPLAY_ID_POSTS:
@@ -116,7 +117,7 @@ const PostList = ({
             ...params,
           }),
           appendOrPrepend,
-          priorFeed,
+          priorFeed
         );
         return;
     }

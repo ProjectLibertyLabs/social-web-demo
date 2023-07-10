@@ -15,8 +15,8 @@
   margin: 16px 0;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  -webkit-hyphens: auto;
-  -moz-hyphens: auto;
+  hyphens: auto;
+  hyphens: auto;
   hyphens: auto;
 }
 

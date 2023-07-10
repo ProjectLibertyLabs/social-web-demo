@@ -10,7 +10,6 @@ import Header from "./chrome/Header";
 import Feed from "./Feed";
 import { Col, ConfigProvider, Layout, Row, Slider, Spin } from "antd";
 import { getContext, setAccessToken } from "./service/AuthService";
-import ConnectionsList from "./network/ConnectionsList";
 import { Content } from "antd/es/layout/layout";
 import { getUserProfile } from "./service/UserProfileService";
 import { HeaderProfile } from "./chrome/HeaderProfile";
@@ -29,21 +28,22 @@ const App = (): JSX.Element => {
   );
   const [feedUser, setFeedUser] = useState<User | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [accountFollowing, setAccountFollowing] = useState<string[] | null>(null);
+  const [accountFollowing, setAccountFollowing] = useState<string[] | null>(
+    null
+  );
 
   const refreshFollowing = async (account: UserAccount) => {
     const userAccountFollows = await dsnpLink.userFollowing(getContext(), {
       dsnpId: account.dsnpId,
     });
     setAccountFollowing(userAccountFollows);
-  }
+  };
 
   useEffect(() => {
     if (userAccount) {
       refreshFollowing(userAccount);
-      setFeedUser(userAccount);
     }
-  }, [userAccount])
+  }, [userAccount]);
 
   if (userAccount) {
     setAccessToken(userAccount.accessToken, userAccount.expires);
@@ -54,7 +54,6 @@ const App = (): JSX.Element => {
     setAccessToken(account.accessToken, account.expires);
     setUserAccount(account);
     refreshFollowing(account);
-    setFeedUser(account);
     setLoading(false);
   };
 
@@ -62,12 +61,23 @@ const App = (): JSX.Element => {
     setUserAccount(undefined);
   };
 
-  const goToProfile = async (dsnpId: string) => {
+  const goToProfile = async (dsnpId?: string) => {
     setLoading(true);
-    const profile = await getUserProfile(dsnpId);
-    setFeedUser(profile || undefined);
+    if (dsnpId) {
+      const profile =
+        userAccount.dsnpId === dsnpId
+          ? userAccount
+          : await getUserProfile(dsnpId);
+      setFeedUser(profile || undefined);
+    } else {
+      setFeedUser(undefined);
+    }
     setLoading(false);
-  }
+  };
+
+  const triggerGraphRefresh = () => {
+    setTimeout(() => refreshFollowing(userAccount), 12_000);
+  };
 
   return (
     <ConfigProvider
@@ -92,21 +102,20 @@ const App = (): JSX.Element => {
             <Spin spinning={loading}>
               <Row>
                 <Col sm={24} md={12} lg={24 - 8}>
-                  <Feed account={userAccount} accountFollowing={accountFollowing || []} user={feedUser} goToProfile={goToProfile} />
+                  <Feed
+                    account={userAccount}
+                    user={feedUser}
+                    goToProfile={goToProfile}
+                  />
                 </Col>
                 <Col sm={24} md={12} lg={8}>
-                  <>
-                    {feedUser && (<HeaderProfile
-                      account={userAccount}
-                      accountFollowing={accountFollowing || []}
-                      user={feedUser}
-                    />)}
-                    <ConnectionsList
-                      account={userAccount}
-                      accountFollowing={accountFollowing || []}
-                      graphRootUser={feedUser || userAccount}
-                    />
-                  </>
+                  <HeaderProfile
+                    triggerGraphRefresh={triggerGraphRefresh}
+                    account={userAccount}
+                    accountFollowing={accountFollowing || []}
+                    user={feedUser}
+                    goToProfile={goToProfile}
+                  />
                 </Col>
               </Row>
             </Spin>
