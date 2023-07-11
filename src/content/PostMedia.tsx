@@ -2,6 +2,7 @@ import React from "react";
 import ReactPlayer from "react-player";
 import { Carousel } from "antd";
 // import { RightOutlined, LeftOutlined } from "@ant-design/icons";
+import styles from "./PostMedia.module.css";
 import type {
   ActivityContentAttachment,
   ActivityContentImage,
@@ -35,7 +36,7 @@ const PostMedia = ({ attachments }: PostMediaProps): JSX.Element => {
   const getPostMediaItems = () => {
     return attachments.map((attachment, index) => {
       return (
-        <div key={index} className="PostMedia__cover">
+        <div key={index} className={styles.cover}>
           {isImage(attachment) && (
             <a
               href={attachment.url[0].href}
@@ -44,7 +45,7 @@ const PostMedia = ({ attachments }: PostMediaProps): JSX.Element => {
             >
               <img
                 alt={attachment.name}
-                className="PostMedia__img"
+                className={styles.image}
                 src={attachment.url[0].href}
               />
             </a>
@@ -53,7 +54,7 @@ const PostMedia = ({ attachments }: PostMediaProps): JSX.Element => {
             <ReactPlayer
               controls
               playsinline
-              className="PostMedia__img"
+              className={styles.image}
               url={attachment.url[0].href}
               width={670}
               height={isVideo(attachment) ? 400 : 55}
@@ -67,10 +68,11 @@ const PostMedia = ({ attachments }: PostMediaProps): JSX.Element => {
 
   return (
     <Carousel
-      dotPosition="top"
+      dotPosition="bottom"
       // nextArrow={<RightOutlined />}
       // prevArrow={<LeftOutlined />}
-      dots={true}
+      className={styles.slider}
+      dots={{ className: styles.dots }}
     >
       {getPostMediaItems()}
     </Carousel>

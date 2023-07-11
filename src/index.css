@@ -18,15 +18,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-
-.slick-slide img {
-  max-height: 500px;
-  object-fit: scale-down;
-  object-position: center;
-  max-width: 100%;
-  flex: 1;
-}
-
-.slick-slide a {
-  display: flex;
-}

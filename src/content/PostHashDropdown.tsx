@@ -3,6 +3,7 @@ import { Dropdown } from "antd";
 import { CopyOutlined, CheckCircleTwoTone } from "@ant-design/icons";
 import { HexString } from "../types";
 import { buildDSNPContentURI } from "../helpers/dsnp";
+import styles from "./PostHashDropdown.module.css";
 
 import type { MenuProps } from "antd";
 
@@ -26,10 +27,8 @@ const PostHashDropdown = ({
     {
       key: "1",
       label: (
-        <div className="PostHashDropdown__menuHash">
-          <div className="PostHashDropdown__menuHashTitle">
-            DSNP Announcement URI:
-          </div>{" "}
+        <div className={styles.menu}>
+          <div className={styles.title}>DSNP Announcement URI:</div>
           {announcementURI}
         </div>
       ),
@@ -38,9 +37,7 @@ const PostHashDropdown = ({
 
   return (
     <Dropdown
-      className={
-        isReply ? "PostHashDropdown__replyBlock" : "PostHashDropdown__block"
-      }
+      className={isReply ? styles.replyRoot : styles.root}
       menu={{
         items,
       }}
@@ -49,7 +46,7 @@ const PostHashDropdown = ({
       placement="bottomRight"
     >
       <button
-        className="PostHashDropdown__button"
+        className={styles.button}
         onClick={(e) => {
           e.preventDefault();
           navigator.clipboard.writeText(announcementURI);

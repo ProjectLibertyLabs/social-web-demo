@@ -2,6 +2,7 @@ import { Input } from "antd";
 import React, { useState } from "react";
 import { createNote } from "@dsnp/activity-content/factories";
 import { DSNPContentURI } from "../helpers/dsnp";
+import styles from "./ReplyInput.module.css";
 
 interface ReplyInputProps {
   parentURI: DSNPContentURI;
@@ -25,9 +26,8 @@ const ReplyInput = ({ parentURI: parent }: ReplyInputProps): JSX.Element => {
   };
 
   return (
-    <div className="ReplyInput__newReplyBlock">
+    <div className={styles.root}>
       <Input.TextArea
-        className="ReplyInput__input"
         placeholder="Reply..."
         value={replyValue}
         onChange={(e) => {
