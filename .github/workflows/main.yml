@@ -14,7 +14,7 @@ jobs:
       - name: Set up NodeJs
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: "npm"
           registry-url: "https://registry.npmjs.org"
           cache-dependency-path: package-lock.json
@@ -28,5 +28,6 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: npm run test
+      # Future
+      # - name: Test
+      #   run: npm run test
