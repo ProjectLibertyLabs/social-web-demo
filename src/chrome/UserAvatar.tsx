@@ -1,6 +1,6 @@
 import React from "react";
 import { Avatar } from "antd";
-import * as blockies from "blockies-ts";
+import { minidenticon } from "minidenticons"
 import { UserOutlined } from "@ant-design/icons";
 import type { User } from "../types";
 import styles from "./UserAvatar.module.css";
@@ -20,7 +20,7 @@ interface UserAvatarProps {
 const UserAvatar = ({ user, avatarSize }: UserAvatarProps): JSX.Element => {
   const iconURL = user
     ? user.profile?.icon ||
-      blockies.create({ seed: user.dsnpId.toString() }).toDataURL()
+      React.useMemo(() => `data:image/svg+xml;utf8,${encodeURIComponent(minidenticon(user.dsnpId.toString()))}`, [user.dsnpId])
     : "";
 
   return (
