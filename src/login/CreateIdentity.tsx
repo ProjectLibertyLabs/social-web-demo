@@ -59,7 +59,7 @@ const CreateIdentity = ({
         // Generate the delegation signature
         const addProviderPayload = payloadAddProvider(
           expiration,
-          Number(providerInfo.providerId),
+          providerInfo.providerId,
           providerInfo.schemas
         );
         const addProviderSignature = await signPayloadWithExtension(

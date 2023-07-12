@@ -52,7 +52,7 @@ export const payloadHandle = (expiration: number, handle: string) => {
 
 export const payloadAddProvider = (
   expiration: number,
-  providerId: number,
+  providerId: string,
   schemaIds: number[]
 ) => {
   schemaIds.sort();
