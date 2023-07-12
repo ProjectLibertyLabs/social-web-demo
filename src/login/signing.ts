@@ -1,4 +1,4 @@
-import { compactFromU8aLim, isFunction, u8aWrapBytes } from "@polkadot/util";
+import { compactFromU8aLim, isFunction, u8aWrapBytes, u8aToHex } from "@polkadot/util";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 import { U8aLike } from "@polkadot/util/types";
 import { TypeRegistry, Bytes } from "@polkadot/types";
@@ -28,7 +28,7 @@ export async function signPayloadWithExtension(
     try {
       signed = await signRaw({
         address,
-        data: payloadWrappedToU8a,
+        data: u8aToHex(payloadWrappedToU8a),
         type: "bytes",
       } as any);
       return signed?.signature;
@@ -52,7 +52,7 @@ export const payloadHandle = (expiration: number, handle: string) => {
 
 export const payloadAddProvider = (
   expiration: number,
-  providerId: string,
+  providerId: number,
   schemaIds: number[]
 ) => {
   schemaIds.sort();
