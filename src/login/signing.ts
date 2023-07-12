@@ -1,4 +1,9 @@
-import { compactFromU8aLim, isFunction, u8aWrapBytes, u8aToHex } from "@polkadot/util";
+import {
+  compactFromU8aLim,
+  isFunction,
+  u8aWrapBytes,
+  u8aToHex,
+} from "@polkadot/util";
 import { web3FromAddress } from "@polkadot/extension-dapp";
 import { U8aLike } from "@polkadot/util/types";
 import { TypeRegistry, Bytes } from "@polkadot/types";
