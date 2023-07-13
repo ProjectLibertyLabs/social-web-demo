@@ -10,15 +10,10 @@ import { getContext } from "../service/AuthService";
 
 interface LoginProps {
   handlesMap: HandlesMap;
-  onLogin: (account: UserAccount, network: string) => void;
-  selectedNetwork: string;
+  onLogin: (account: UserAccount) => void;
 }
 
-const Login = ({
-  onLogin,
-  handlesMap,
-  selectedNetwork,
-}: LoginProps): JSX.Element => {
+const Login = ({ onLogin, handlesMap }: LoginProps): JSX.Element => {
   const [selectedAccount, setSelectedAccount] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,16 +47,13 @@ const Login = ({
           challenge,
         }
       );
-      onLogin(
-        {
-          address: selectedAccount,
-          handle,
-          accessToken,
-          expires,
-          dsnpId,
-        },
-        selectedNetwork
-      );
+      onLogin({
+        address: selectedAccount,
+        handle,
+        accessToken,
+        expires,
+        dsnpId,
+      });
     } catch (e) {
       console.error(e);
       setIsLoading(false);

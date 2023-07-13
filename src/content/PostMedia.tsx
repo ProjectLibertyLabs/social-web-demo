@@ -9,6 +9,7 @@ import type {
   ActivityContentVideo,
   ActivityContentAudio,
 } from "@dsnp/activity-content/types";
+import { tryUseIpfsGateway } from "../service/IpfsService";
 
 interface PostMediaProps {
   attachments: ActivityContentAttachment[];
@@ -39,14 +40,14 @@ const PostMedia = ({ attachments }: PostMediaProps): JSX.Element => {
         <div key={index} className={styles.cover}>
           {isImage(attachment) && (
             <a
-              href={attachment.url[0].href}
+              href={tryUseIpfsGateway(attachment.url[0].href)}
               target="_blank"
               rel="noopener noreferrer"
             >
               <img
                 alt={attachment.name}
                 className={styles.image}
-                src={attachment.url[0].href}
+                src={tryUseIpfsGateway(attachment.url[0].href)}
               />
             </a>
           )}
@@ -55,7 +56,7 @@ const PostMedia = ({ attachments }: PostMediaProps): JSX.Element => {
               controls
               playsinline
               className={styles.image}
-              url={attachment.url[0].href}
+              url={tryUseIpfsGateway(attachment.url[0].href)}
               width={670}
               height={isVideo(attachment) ? 400 : 55}
               muted

@@ -13,6 +13,7 @@ import { getContext, setAccessToken } from "./service/AuthService";
 import { Content } from "antd/es/layout/layout";
 import { getUserProfile } from "./service/UserProfileService";
 import { HeaderProfile } from "./chrome/HeaderProfile";
+import { setIpfsGateway } from "./service/IpfsService";
 
 const App = (): JSX.Element => {
   const _fakeUser = {
@@ -49,9 +50,14 @@ const App = (): JSX.Element => {
     setAccessToken(userAccount.accessToken, userAccount.expires);
   }
 
-  const handleLogin = async (account: UserAccount, _network: string) => {
+  const handleLogin = async (
+    account: UserAccount,
+    _network: string,
+    ipfsGateway?: string
+  ) => {
     setLoading(true);
     setAccessToken(account.accessToken, account.expires);
+    ipfsGateway && setIpfsGateway(ipfsGateway);
     setUserAccount(account);
     refreshFollowing(account);
     setLoading(false);

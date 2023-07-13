@@ -1,6 +1,10 @@
 import * as r from "@typoas/runtime";
 export type ProviderResponse = {
   nodeUrl: string;
+  /**
+   * IPFS Path Style Gateway base URI
+   */
+  ipfsGateway?: string;
   providerId: string;
   schemas: number[];
 };
@@ -89,6 +93,7 @@ export type ReplyExtended = {
 };
 export type CreatePostRequest = {
   content: string;
+  inReplyTo?: string;
   images?: string[];
 };
 export type EditPostRequest = {
