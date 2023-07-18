@@ -51,7 +51,7 @@ const CreateIdentity = ({
       try {
         // Get the current block number
         const blockNumber = await getBlockNumber(providerInfo.nodeUrl);
-        // const expiration = blockNumber + 50;
+        const expiration = blockNumber + 50;
         // Generate the delegation signature
         providerInfo.schemas.sort();
 
@@ -60,32 +60,22 @@ const CreateIdentity = ({
             schemaIds: providerInfo.schemas,
           };
 
-          console.log("sponsoredDidParams", sponsoredDidParams);
-
-        
         const didSponsoredSignature = await signPayloadWithDidExtension(
           signingAccount.account.address,
           sponsoredDidParams
         );
   
-        console.log("didSponsoredSignature ---- signed", didSponsoredSignature);
-
-
         
         // Generate the Handle Signature
-        // const handlePayload = payloadHandle(expiration, handle);
+        const handlePayload = payloadHandle(expiration, handle);
 
-        // if (!handleSignature.startsWith("0x"))
-        //   throw Error("Unable to sign: " + handleSignature);
+        const handleSignature = await signPayloadWithExtension(
+          signingAccount.account.address,
+          handlePayload.toU8a()
+        );
 
-        // const addProviderSignature = await signPayloadWithExtension(
-        //   signingAccount.account.address,
-        //   addProviderPayload.toU8a()
-        // );
-
-        // if (!addProviderSignature.startsWith("0x"))
-        //   throw Error("Unable to sign: " + handleSignature);
-
+        if (!handleSignature.startsWith("0x"))
+          throw Error("Unable to sign: " + handleSignature);
         // Create identity
         const { expires, accessToken } = await dsnpLink.authDidCreate(
           getContext(),
@@ -99,8 +89,8 @@ const CreateIdentity = ({
               merkleLeaves: didSponsoredSignature[0],
               didSignature: didSponsoredSignature[1]
             },
-            expiration: 99,
-            handleSignature: "0x",
+            expiration,
+            handleSignature,
           }
         );
 
