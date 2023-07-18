@@ -19,6 +19,23 @@ export type LoginResponse = {
   expires: number;
   dsnpId: string;
 };
+export interface DidIdentityProof {
+  merkleLeaves: {
+    blinded: string[],
+    revealed: any[],
+  },
+  didSignature: any[],
+}
+export type CreateIdentityWithDidRequest = {
+  algo: "SR25519";
+  baseHandle: string;
+  encoding: "hex";
+  identifier: string;
+  proof: DidIdentityProof;
+  expiration: number;
+  handleSignature: string;
+};
+
 export type CreateIdentityRequest = {
   addProviderSignature: string;
   algo: "SR25519";
@@ -128,7 +145,7 @@ export function createContext<FetcherData>(
   params?: r.CreateContextParams<AuthMethods, FetcherData>
 ): r.Context<AuthMethods, FetcherData> {
   return new r.Context<AuthMethods, FetcherData>({
-    serverConfiguration: new r.ServerConfiguration("http://localhost:5000", {}),
+    serverConfiguration: new r.ServerConfiguration("http://localhost:5001", {}),
     authMethods: configureAuth(params?.authProviders),
     ...params,
   });
@@ -196,6 +213,26 @@ export async function authLogout<FetcherData>(
     params,
     method: r.HttpMethod.POST,
     auth: ["tokenAuth"],
+  });
+  const res = await ctx.sendRequest(req, opts);
+  return ctx.handleResponse(res, {});
+}
+
+/**
+ * Creates a new DSNP Identity
+ */
+export async function authDidCreate<FetcherData>(
+  ctx: r.Context<AuthMethods, FetcherData>,
+  params: {},
+  body: CreateIdentityWithDidRequest,
+  opts?: FetcherData
+): Promise<CreateIdentityResponse> {
+  console.log("request body", body);
+  const req = await ctx.createRequest({
+    path: "/v1/auth/did-create",
+    params,
+    method: r.HttpMethod.POST,
+    body,
   });
   const res = await ctx.sendRequest(req, opts);
   return ctx.handleResponse(res, {});
