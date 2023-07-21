@@ -7,7 +7,7 @@ import {
 import { web3FromAddress } from "@polkadot/extension-dapp";
 import { U8aLike } from "@polkadot/util/types";
 import { TypeRegistry, Bytes } from "@polkadot/types";
-import { AddProviderPayload, Value } from "../types";
+import { Value, SponsoredDidParams } from "../types";
 import { getApi } from "./CreateIdentity";
 import * as Kilt from '@kiltprotocol/sdk-js'
 
@@ -24,15 +24,17 @@ Registry.register({
   },
 });
 
-export async function buildCrossChainSignaturePayload(did: Kilt.DidUri, sponsoredDidParams: any) {
-  // alice
+export async function buildCrossChainSignaturePayloadForSponsoredMsa(did: Kilt.DidUri, sponsoredDidParams: SponsoredDidParams) {
+  // alice (address associated with provider who is going to submit the transaction)
   let submitterAccount: string = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+
   let api = await getApi();
   const blockNumber = await api.query.system.number();
   const genesisHash = await api.query.system.blockHash(0);
-  // const createSponsoredAccountWithDelegationCall = await api.tx.msa.createSponsoredMsaWithDid(sponsoredDidParams.providerId, sponsoredDidParams.schemas);
-  // console.log("createSponsoredAccountWithDelegationCall", createSponsoredAccountWithDelegationCall.toHex());
 
+  console.log(sponsoredDidParams)
+  const createSponsoredAccountWithDelegationCall = await api.tx.msa.createSponsoredMsaWithDid(sponsoredDidParams.authorizedMsaId, sponsoredDidParams.schemaIds);
+  console.log("createSponsoredAccountWithDelegationCall.toHex()", createSponsoredAccountWithDelegationCall.toHex());
   const encodedCall = "0x3c0e01000000000000001c0100020003000400050006000800"
   const decodedCall = api.createType('Call', encodedCall)
 
@@ -56,26 +58,106 @@ export async function buildCrossChainSignaturePayload(did: Kilt.DidUri, sponsore
         genesisHash,
       ]
     ).toHex()
-    console.log("ENCODED CALL FOR SIGNING", signaturePayload);
 
   let payload = {
     view: [
-            { value: `createSponsoredAccountWithDelegation(${sponsoredDidParams.providerId}, ${sponsoredDidParams.schemas})`, details: decodedCall.toHex(), label: 'Call',  },
-            { details: "Consumer Root Nonce", value: (identityDetails.toJSON() as any).details, label: 'Consumer Root Nonce',  },
-            { details: "Submitter", value: submitterAccount, label: 'Submitter',  },
-            { details: "Provider Block Number", value: blockNumber.toHuman(), label: 'Provider Block Number',  },
-            { details: "Consumer Genesis Hash", value: genesisHash.toHuman(), label: 'Consumer Genesis Hash',  },
-          ],
+      { value: `createSponsoredAccountWithDelegation(${sponsoredDidParams.authorizedMsaId}, [${sponsoredDidParams.schemaIds}])`, details: decodedCall.toHex(), label: 'Call', },
+      { details: "Consumer Root Nonce", value: (identityDetails.toJSON() as any).details, label: 'Consumer Root Nonce', },
+      { details: "Submitter", value: submitterAccount, label: 'Submitter', },
+      { details: "Provider Block Number", value: blockNumber.toHuman(), label: 'Provider Block Number', },
+      { details: "Consumer Genesis Hash", value: genesisHash.toHuman(), label: 'Consumer Genesis Hash', },
+    ],
     blockNumber: parseInt(blockNumber.toHex(), 16),
-    signaturePayload, 
+    signaturePayload,
   }
 
   return payload;
 }
 
-export async function signPayloadWithDidExtension(
+export async function buildCrossChainSignaturePayloadForHandle(did: Kilt.DidUri, handleParams: any) {
+  // alice
+  let submitterAccount: string = "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY";
+  let api = await getApi();
+  const blockNumber = await api.query.system.number();
+  const genesisHash = await api.query.system.blockHash(0);
+
+  const handlePayload = payloadHandle(handleParams.expiration, handleParams.baseHandle);
+
+  const claimHandle = (await api.tx.handles.claimHandleForDid(handlePayload));
+
+  const decodedCall = api.createType('Call', claimHandle)
+
+  const identityDetails = await api.query.dipConsumer.identityEntries(
+    Kilt.Did.toChain(did)
+  )
+
+  const accountIdType = "AccountId32";
+  const blockNumberType = "u32";
+  const identityDetailsType = "u128";
+
+  console.log("here................................");
+
+  const signaturePayload = api
+    .createType(
+      `(Call, ${identityDetailsType}, ${accountIdType}, ${blockNumberType}, Hash)`,
+      [
+        decodedCall.toHex(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (identityDetails.toJSON() as any).details,
+        submitterAccount,
+        blockNumber,
+        genesisHash,
+      ]
+    ).toHex()
+  console.log("ENCODED CALL FOR SIGNING", signaturePayload);
+
+  let payload = {
+    view: [
+      { value: `claimHandleForDid(${handlePayload})`, details: decodedCall.toHex(), label: 'Call', },
+      { details: "Consumer Root Nonce", value: (identityDetails.toJSON() as any).details, label: 'Consumer Root Nonce', },
+      { details: "Submitter", value: submitterAccount, label: 'Submitter', },
+      { details: "Provider Block Number", value: blockNumber.toHuman(), label: 'Provider Block Number', },
+      { details: "Consumer Genesis Hash", value: genesisHash.toHuman(), label: 'Consumer Genesis Hash', },
+    ],
+    blockNumber: parseInt(blockNumber.toHex(), 16),
+    signaturePayload,
+  }
+
+  return payload;
+}
+
+
+export async function signCreateSponsoredMsaWithDidPayload(
   address: string,
-  sponsoredDidParams: any 
+  sponsoredDidParams: SponsoredDidParams,
+  didUri: Kilt.DidUri
+) {
+  const walletAccount = await web3FromAddress(address);
+  const signRaw = walletAccount.signer?.signRaw;
+  let signed;
+  if (signRaw && isFunction(signRaw)) {
+    try {
+      let payload = await buildCrossChainSignaturePayloadForSponsoredMsa(didUri, sponsoredDidParams);
+      let result = await window.kilt.sporran.signCrossChain(
+        payload.signaturePayload,
+        payload.blockNumber,
+        payload.view,
+        didUri
+      );
+
+      return JSON.parse(result.signed);
+    } catch (e) {
+      console.log(e);
+      return "ERROR!";
+    }
+  }
+  return "Unknown error";
+}
+
+export async function signPayloadWithDidExtensionHandle(
+  address: string,
+  handleParams: any,
+  didUri: Kilt.DidUri,
 ) {
   const walletAccount = await web3FromAddress(address);
   const signRaw = walletAccount.signer?.signRaw;
@@ -83,15 +165,13 @@ export async function signPayloadWithDidExtension(
   if (signRaw && isFunction(signRaw)) {
     // const payloadWrappedToU8a = u8aWrapBytes(payload);
     try {
-      const info = await window.kilt.sporran.getDidList();
-      let payload = await buildCrossChainSignaturePayload(info[0].did, sponsoredDidParams);
-      console.log("signingPayload", payload);
-      console.log("did---information", info[0]);
+      let payload = await buildCrossChainSignaturePayloadForHandle(didUri, handleParams);
+
       let result = await window.kilt.sporran.signCrossChain(
         payload.signaturePayload,
         payload.blockNumber,
         payload.view,
-        info[0].did
+        didUri
       );
 
       return JSON.parse(result.signed);
@@ -159,7 +239,7 @@ export const sponsoredDidParams = (
 ) => {
   schemaIds.sort();
 
-   return {
+  return {
     authorizedMsaId: providerId,
     schemaIds,
   }

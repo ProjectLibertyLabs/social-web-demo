@@ -1,4 +1,4 @@
-import type { ICredential, DidResourceUri } from '@kiltprotocol/sdk-js';
+import type { ICredential, DidResourceUri, KiltAddress } from '@kiltprotocol/sdk-js';
 import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import type { U8aLike } from "@polkadot/util/types";
 import type { ReactNode } from 'react';
@@ -62,5 +62,16 @@ export type  signCrossChain = (
     values: Value[],
     didUri?: DidUri,
   ) => Promise<{ signed: string }>;
+
+export type signExtrinsicWithDid = (
+  extrinsic: HexString,
+  submitter: KiltAddress,
+  didUri?: DidUri,
+) => Promise<{signed: HexString, didKeyUri: DidResourceUri;}>
+
+export type SponsoredDidParams = {
+  authorizedMsaId: number,
+  schemaIds: number[],
+}
 
 export type AddProviderPayload = { authorizedMsaId?: any; schemaIds?: any, expiration?: any; };

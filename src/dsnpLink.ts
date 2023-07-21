@@ -33,7 +33,7 @@ export type CreateIdentityWithDidRequest = {
   identifier: string;
   proof: DidIdentityProof;
   expiration: number;
-  handleSignature: string;
+  handleProof: DidIdentityProof;
 };
 
 export type CreateIdentityRequest = {
