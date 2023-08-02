@@ -8,6 +8,8 @@ import { getContext } from "../service/AuthService";
 import styles from "./Post.module.css";
 import { Spin } from "antd";
 
+const OLDEST_BLOCK_TO_GO_TO = 1_635_282;
+
 type PostListProps = {
   feedType: FeedTypes;
   user: User | undefined;
@@ -56,17 +58,27 @@ const PostList = ({
       )
     );
     if (appendOrPrepend === "append") {
+      // Older stuff
       setCurrentFeed([...priorFeed, ...result.posts]);
     } else {
+      // Newer stuff
       setCurrentFeed([...result.posts, ...priorFeed]);
     }
-    setIsLoading(false);
+
+    if (appendOrPrepend === "append" && result.posts.length === 0 && result.oldestBlockNumber > OLDEST_BLOCK_TO_GO_TO) {
+      // Keep going back in time
+      setPriorTrigger(priorTrigger - 1);
+    } else {
+      // Good for now
+      setIsLoading(false);
+    }
+
   };
 
   useEffect(() => {
     const getOlder = refreshTrigger === priorTrigger;
     fetchData(getOlder);
-  }, [feedType, user, refreshTrigger]);
+  }, [feedType, user, refreshTrigger, priorTrigger]);
 
   const fetchData = async (getOlder: boolean) => {
     const isAddingMore = priorFeedType === feedType;
@@ -132,7 +144,7 @@ const PostList = ({
         <InfiniteScroll
           dataLength={currentFeed.length + (hasMore ? 1 : 0)}
           next={() => {
-            fetchData(false);
+            fetchData(true);
           }}
           hasMore={hasMore}
           loader={<Title level={4}>Loading...</Title>}
