@@ -65,14 +65,17 @@ const PostList = ({
       setCurrentFeed([...result.posts, ...priorFeed]);
     }
 
-    if (appendOrPrepend === "append" && result.posts.length === 0 && result.oldestBlockNumber > OLDEST_BLOCK_TO_GO_TO) {
+    if (
+      appendOrPrepend === "append" &&
+      result.posts.length === 0 &&
+      result.oldestBlockNumber > OLDEST_BLOCK_TO_GO_TO
+    ) {
       // Keep going back in time
       setPriorTrigger(priorTrigger - 1);
     } else {
       // Good for now
       setIsLoading(false);
     }
-
   };
 
   useEffect(() => {
