@@ -14,6 +14,7 @@ import { Content } from "antd/es/layout/layout";
 import { getUserProfile } from "./service/UserProfileService";
 import { HeaderProfile } from "./chrome/HeaderProfile";
 import { setIpfsGateway } from "./service/IpfsService";
+import AuthErrorBoundary from "./AuthErrorBoundary";
 
 const App = (): JSX.Element => {
   const _fakeUser = {
@@ -32,7 +33,7 @@ const App = (): JSX.Element => {
   const [accountFollowing, setAccountFollowing] = useState<string[] | null>(
     null
   );
-  const [network, setNetwork] = useState<Network>("mainnet");
+  const [network, setNetwork] = useState<Network>("testnet");
 
   const refreshFollowing = async (account: UserAccount) => {
     const userAccountFollows = await dsnpLink.userFollowing(getContext(), {
@@ -109,12 +110,14 @@ const App = (): JSX.Element => {
             <Spin spinning={loading}>
               <Row>
                 <Col sm={24} md={12} lg={24 - 8}>
-                  <Feed
-                    network={network}
-                    account={userAccount}
-                    user={feedUser}
-                    goToProfile={goToProfile}
-                  />
+                  <AuthErrorBoundary onError={handleLogout}>
+                    <Feed
+                      network={network}
+                      account={userAccount}
+                      user={feedUser}
+                      goToProfile={goToProfile}
+                    />
+                  </AuthErrorBoundary>
                 </Col>
                 <Col sm={24} md={12} lg={8}>
                   <HeaderProfile

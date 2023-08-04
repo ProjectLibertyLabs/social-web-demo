@@ -1,12 +1,11 @@
 import React, { useEffect } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
 import Title from "antd/es/typography/Title";
 import Post from "./Post";
 import * as dsnpLink from "../dsnpLink";
 import { User, FeedTypes, Network } from "../types";
 import { getContext } from "../service/AuthService";
 import styles from "./Post.module.css";
-import { Spin } from "antd";
+import { Button, Space, Spin } from "antd";
 
 const OLDEST_BLOCK_TO_GO_TO: Record<Network, number> = {
   local: 1,
@@ -87,7 +86,7 @@ const PostList = ({
   useEffect(() => {
     const getOlder = refreshTrigger === priorTrigger;
     fetchData(getOlder);
-  }, [feedType, user, refreshTrigger, priorTrigger]);
+  }, [feedType, user, refreshTrigger, priorTrigger, network]);
 
   const fetchData = async (getOlder: boolean) => {
     const isAddingMore = priorFeedType === feedType;
@@ -144,21 +143,15 @@ const PostList = ({
     }
   };
 
-  const hasMore = oldestBlockNumber ? oldestBlockNumber > 1 : true;
+  const hasMore = oldestBlockNumber
+    ? oldestBlockNumber > OLDEST_BLOCK_TO_GO_TO[network]
+    : true;
 
   return (
     <div className={styles.root}>
       {isLoading && <Spin size="large" spinning={true} />}
-      {oldestBlockNumber !== undefined && currentFeed.length > 0 ? (
-        <InfiniteScroll
-          dataLength={currentFeed.length + (hasMore ? 1 : 0)}
-          next={() => {
-            fetchData(true);
-          }}
-          hasMore={hasMore}
-          loader={<Title level={4}>Loading...</Title>}
-          endMessage={<Title level={4}>That's all there is!</Title>}
-        >
+      {oldestBlockNumber !== undefined && (
+        <>
           {currentFeed.map((feedItem, index) => (
             <Post
               key={index}
@@ -167,9 +160,25 @@ const PostList = ({
               goToProfile={goToProfile}
             />
           ))}
-        </InfiniteScroll>
-      ) : (
-        "Empty Feed!"
+          <Space />
+          {hasMore && (
+            <div className={styles.loadMoreButtonContainer}>
+              <Button
+                type="primary"
+                onClick={() => {
+                  fetchData(true);
+                }}
+              >
+                Load More
+              </Button>
+            </div>
+          )}
+          {!hasMore && (
+            <div className={styles.endMessageContainer}>
+              <Title level={4}>That's all there is!</Title>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
