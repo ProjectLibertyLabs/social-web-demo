@@ -12,7 +12,10 @@ import styles from "./LoginScreen.module.css";
 const dsnpLinkCtx = dsnpLink.createContext();
 
 interface LoginScreenProps {
-  onLogin: (account: UserAccount, network: string, gateway?: string) => void;
+  onLogin: (
+    account: UserAccount,
+    providerInfo: dsnpLink.ProviderResponse
+  ) => void;
 }
 
 const toHandlesMap = (
@@ -103,13 +106,7 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
             <>
               <Col span={12}>
                 <Login
-                  onLogin={(account) =>
-                    onLogin(
-                      account,
-                      providerInfo.nodeUrl,
-                      providerInfo.ipfsGateway
-                    )
-                  }
+                  onLogin={(account) => onLogin(account, providerInfo)}
                   handlesMap={handlesMap}
                 />
               </Col>

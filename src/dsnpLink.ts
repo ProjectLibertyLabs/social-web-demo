@@ -7,6 +7,7 @@ export type ProviderResponse = {
   ipfsGateway?: string;
   providerId: string;
   schemas: number[];
+  network: "local" | "testnet" | "mainnet";
 };
 export type ChallengeResponse = {
   challenge: string;

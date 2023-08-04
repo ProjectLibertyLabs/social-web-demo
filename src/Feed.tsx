@@ -3,16 +3,22 @@ import NewPost from "./content/NewPost";
 import PostList from "./content/PostList";
 import { Button, Spin } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { UserAccount, FeedTypes, User } from "./types";
+import { UserAccount, FeedTypes, User, Network } from "./types";
 import styles from "./Feed.module.css";
 
 type FeedProps = {
   account: UserAccount;
   user: User | undefined;
   goToProfile: (dsnpId?: string) => void;
+  network: Network;
 };
 
-const Feed = ({ account, user, goToProfile }: FeedProps): JSX.Element => {
+const Feed = ({
+  account,
+  user,
+  goToProfile,
+  network,
+}: FeedProps): JSX.Element => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(Date.now());
@@ -109,7 +115,7 @@ const Feed = ({ account, user, goToProfile }: FeedProps): JSX.Element => {
               setTimeout(() => {
                 setRefreshTrigger(Date.now());
                 setIsPosting(false);
-              }, 12_000);
+              }, 14_000);
             }}
             onCancel={() => setIsModalOpen(false)}
             account={account}
@@ -118,6 +124,7 @@ const Feed = ({ account, user, goToProfile }: FeedProps): JSX.Element => {
       </div>
       <Spin spinning={isPosting} size="large" />
       <PostList
+        network={network}
         refreshTrigger={refreshTrigger}
         feedType={feedType}
         user={user}

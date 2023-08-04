@@ -3,12 +3,16 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import Title from "antd/es/typography/Title";
 import Post from "./Post";
 import * as dsnpLink from "../dsnpLink";
-import { User, FeedTypes } from "../types";
+import { User, FeedTypes, Network } from "../types";
 import { getContext } from "../service/AuthService";
 import styles from "./Post.module.css";
 import { Spin } from "antd";
 
-const OLDEST_BLOCK_TO_GO_TO = 1_635_282;
+const OLDEST_BLOCK_TO_GO_TO: Record<Network, number> = {
+  local: 1,
+  testnet: 1_635_282,
+  mainnet: 1_758_013,
+};
 
 type PostListProps = {
   feedType: FeedTypes;
@@ -17,6 +21,7 @@ type PostListProps = {
   refreshTrigger: number;
   goToProfile: (dsnpId?: string) => void;
   resetFeed: () => void;
+  network: Network;
 };
 
 type FeedItem = dsnpLink.BroadcastExtended;
@@ -27,6 +32,7 @@ const PostList = ({
   refreshTrigger,
   goToProfile,
   resetFeed,
+  network,
 }: PostListProps): JSX.Element => {
   const [priorTrigger, setPriorTrigger] =
     React.useState<number>(refreshTrigger);
@@ -68,7 +74,7 @@ const PostList = ({
     if (
       appendOrPrepend === "append" &&
       result.posts.length === 0 &&
-      result.oldestBlockNumber > OLDEST_BLOCK_TO_GO_TO
+      result.oldestBlockNumber > OLDEST_BLOCK_TO_GO_TO[network]
     ) {
       // Keep going back in time
       setPriorTrigger(priorTrigger - 1);

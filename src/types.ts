@@ -1,5 +1,7 @@
 import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
-import type { U8aLike } from "@polkadot/util/types";
+import type { ProviderResponse } from "./dsnpLink";
+
+export type Network = ProviderResponse["network"];
 
 export type UserAccount = {
   address: string;

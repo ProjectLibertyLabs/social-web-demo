@@ -15,7 +15,10 @@ import { getContext, setAccessToken } from "../service/AuthService";
 
 interface CreateIdentityProps {
   handlesMap: HandlesMap;
-  onLogin: (account: UserAccount, network: string, gateway?: string) => void;
+  onLogin: (
+    account: UserAccount,
+    providerInfo: dsnpLink.ProviderResponse
+  ) => void;
   providerInfo: dsnpLink.ProviderResponse;
 }
 
@@ -125,8 +128,7 @@ const CreateIdentity = ({
             accessToken,
             dsnpId: accountResp.dsnpId,
           },
-          providerInfo.nodeUrl,
-          providerInfo.ipfsGateway
+          providerInfo
         );
       } catch (e) {
         console.error(e);
