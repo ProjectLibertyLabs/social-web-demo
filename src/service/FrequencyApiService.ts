@@ -8,7 +8,7 @@ export const getBlockNumber = async (url: string): Promise<number> => {
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: 1,
-        method: "chain_getBlock",
+        method: "chain_getHeader",
         params: [],
       }),
     });
@@ -24,7 +24,7 @@ export const getBlockNumber = async (url: string): Promise<number> => {
     }
 
     if (data.result) {
-      return Number(data.result.block.header.number);
+      return Number(data.result.block.number);
     }
 
     throw new Error("Invalid response format");
