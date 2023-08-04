@@ -24,7 +24,7 @@ export const getBlockNumber = async (url: string): Promise<number> => {
     }
 
     if (data.result) {
-      return Number(data.result.block.number);
+      return Number(data.result.number);
     }
 
     throw new Error("Invalid response format");
