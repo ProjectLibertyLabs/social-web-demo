@@ -22,7 +22,7 @@ const Feed = ({
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(Date.now());
-  const [feedType, setFeedType] = useState<FeedTypes>(FeedTypes.MY_FEED);
+  const [feedType, setFeedType] = useState<FeedTypes>(FeedTypes.DISCOVER);
 
   if (
     feedType === FeedTypes.DISPLAY_ID_POSTS &&
@@ -32,7 +32,7 @@ const Feed = ({
   }
 
   if (feedType === FeedTypes.DISPLAY_ID_POSTS && !user) {
-    setFeedType(FeedTypes.MY_FEED);
+    setFeedType(FeedTypes.DISCOVER);
   }
 
   const feedNavClassName = (navItemType: FeedTypes) =>
@@ -41,7 +41,7 @@ const Feed = ({
       : styles.navigationItem;
 
   const resetFeed = () => {
-    setFeedType(FeedTypes.MY_FEED);
+    setFeedType(FeedTypes.DISCOVER);
     goToProfile();
   };
 
@@ -49,7 +49,7 @@ const Feed = ({
     if (dsnpId) {
       setFeedType(FeedTypes.DISPLAY_ID_POSTS);
     } else {
-      setFeedType(FeedTypes.MY_FEED);
+      setFeedType(FeedTypes.DISCOVER);
     }
 
     goToProfile(dsnpId);
