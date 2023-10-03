@@ -40,7 +40,8 @@ const Post = ({
   // TODO: validate content as ActivityContentNote or have DSNP Link do it
 
   const attachments: ActivityContentAttachment[] = content.attachment || [];
-  const tags: ActivityContentTag[] = content.tag as ActivityContentTag[] || [];
+  const tags: ActivityContentTag[] =
+    (content.tag as ActivityContentTag[]) || [];
 
   return (
     <Card key={feedItem.contentHash} className={styles.root} bordered={false}>
@@ -80,7 +81,7 @@ const Post = ({
         <ReplyBlock
           parentURI={buildDSNPContentURI(
             BigInt(feedItem.fromId),
-            feedItem.contentHash
+            feedItem.contentHash,
           )}
           showReplyInput={showReplyInput}
           goToProfile={goToProfile}

@@ -52,8 +52,8 @@ const ConnectionsList = ({
                 profile: {},
               };
             }
-          })
-      )
+          }),
+      ),
     );
     setConnectionsList(list);
     setIsLoading(false);

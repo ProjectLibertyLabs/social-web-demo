@@ -6,10 +6,7 @@ interface CachedLinkPreviewProps {
   url: string;
 }
 
-const CachedLinkPreview = ({
-  url,
-}: CachedLinkPreviewProps): JSX.Element => {
-
+const CachedLinkPreview = ({ url }: CachedLinkPreviewProps): JSX.Element => {
   const fetchPreview = async (url: string) => {
     const ctx = getContext();
     const req = await ctx.createRequest({
@@ -25,22 +22,24 @@ const CachedLinkPreview = ({
       description: json.description || "",
       image: json.image || "",
       siteName: "",
-      hostname: ""
+      hostname: "",
     };
   };
 
-  const previewCache : any = {};
+  const previewCache: any = {};
 
   return (
-    <LinkPreview url={url} fetcher={
-      async (url) => {
+    <LinkPreview
+      url={url}
+      fetcher={async (url) => {
         if (!previewCache[url]) {
           previewCache[url] = fetchPreview(url);
         }
         return previewCache[url];
-      }
-    } width='400px' />
-  )
+      }}
+      width="400px"
+    />
+  );
 };
 
 export default CachedLinkPreview;

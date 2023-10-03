@@ -17,7 +17,7 @@ interface CreateIdentityProps {
   handlesMap: HandlesMap;
   onLogin: (
     account: UserAccount,
-    providerInfo: dsnpLink.ProviderResponse
+    providerInfo: dsnpLink.ProviderResponse,
   ) => void;
   providerInfo: dsnpLink.ProviderResponse;
 }
@@ -53,7 +53,7 @@ const CreateIdentity = ({
         const handlePayload = payloadHandle(expiration, handle);
         const handleSignature = await signPayloadWithExtension(
           signingAccount.account.address,
-          handlePayload.toU8a()
+          handlePayload.toU8a(),
         );
 
         if (!handleSignature.startsWith("0x"))
@@ -63,11 +63,11 @@ const CreateIdentity = ({
         const addProviderPayload = payloadAddProvider(
           expiration,
           providerInfo.providerId,
-          providerInfo.schemas
+          providerInfo.schemas,
         );
         const addProviderSignature = await signPayloadWithExtension(
           signingAccount.account.address,
-          addProviderPayload.toU8a()
+          addProviderPayload.toU8a(),
         );
 
         if (!addProviderSignature.startsWith("0x"))
@@ -85,7 +85,7 @@ const CreateIdentity = ({
             publicKey: signingAccount.account.address,
             addProviderSignature,
             handleSignature,
-          }
+          },
         );
 
         setAccessToken(accessToken, expires);
@@ -94,7 +94,7 @@ const CreateIdentity = ({
         // We have to poll for the account creation
         let accountResp: dsnpLink.AuthAccountResponse | null = null;
         const getDsnpAndHandle = async (
-          timeout: number
+          timeout: number,
         ): Promise<null | dsnpLink.AuthAccountResponse> =>
           new Promise((resolve) => {
             setTimeout(async () => {
@@ -111,7 +111,7 @@ const CreateIdentity = ({
         let tries = 1;
         while (accountResp === null && tries < 10) {
           console.log(
-            "Waiting another 3 seconds before getting the account again..."
+            "Waiting another 3 seconds before getting the account again...",
           );
           accountResp = await getDsnpAndHandle(3_000);
           tries++;
@@ -128,7 +128,7 @@ const CreateIdentity = ({
             accessToken,
             dsnpId: accountResp.dsnpId,
           },
-          providerInfo
+          providerInfo,
         );
       } catch (e) {
         console.error(e);
@@ -164,7 +164,7 @@ const CreateIdentity = ({
                     label: meta.name
                       ? `${meta.name} (${address})`
                       : `${address}`,
-                  })
+                  }),
                 )}
               />
             </Form.Item>

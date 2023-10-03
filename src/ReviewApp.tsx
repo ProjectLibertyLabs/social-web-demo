@@ -27,13 +27,13 @@ const App = (): JSX.Element => {
   };
   const [userAccount, setUserAccount] = useStickyState<UserAccount | undefined>(
     undefined,
-    "user-account"
+    "user-account",
   );
   const [feedUser, setFeedUser] = useState<User | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [accountFollowing, setAccountFollowing] = useState<string[] | null>(
-    null
+    null,
   );
   const [network, setNetwork] = useState<Network>("testnet");
 
@@ -56,7 +56,7 @@ const App = (): JSX.Element => {
 
   const handleLogin = async (
     account: UserAccount,
-    providerInfo: dsnpLink.ProviderResponse
+    providerInfo: dsnpLink.ProviderResponse,
   ) => {
     setLoading(true);
     setAccessToken(account.accessToken, account.expires);
@@ -113,16 +113,18 @@ const App = (): JSX.Element => {
               <Row>
                 <Col sm={24} md={12} lg={24 - 8}>
                   <AuthErrorBoundary onError={handleLogout}>
-          <NewReview
-            onSuccess={() => {
-              setIsPosting(true);
-              setTimeout(() => {
-                setIsPosting(false);
-              }, 14_000);
-            }}
-            onCancel={() => {/*FIXME*/}}
-            account={userAccount}
-          />
+                    <NewReview
+                      onSuccess={() => {
+                        setIsPosting(true);
+                        setTimeout(() => {
+                          setIsPosting(false);
+                        }, 14_000);
+                      }}
+                      onCancel={() => {
+                        /*FIXME*/
+                      }}
+                      account={userAccount}
+                    />
                   </AuthErrorBoundary>
                 </Col>
               </Row>

@@ -23,7 +23,7 @@ Registry.register({
 
 export async function signPayloadWithExtension(
   address: string,
-  payload: U8aLike
+  payload: U8aLike,
 ) {
   const walletAccount = await web3FromAddress(address);
   const signRaw = walletAccount.signer?.signRaw;
@@ -58,7 +58,7 @@ export const payloadHandle = (expiration: number, handle: string) => {
 export const payloadAddProvider = (
   expiration: number,
   providerId: string,
-  schemaIds: number[]
+  schemaIds: number[],
 ) => {
   schemaIds.sort();
   const claimHandlePayload = Registry.createType("AddProvider", {

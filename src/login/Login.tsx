@@ -29,7 +29,7 @@ const Login = ({ onLogin, handlesMap }: LoginProps): JSX.Element => {
 
       const signedChallenge = await signPayloadWithExtension(
         selectedAccount,
-        challenge
+        challenge,
       );
 
       if (!signedChallenge.startsWith("0x")) {
@@ -45,7 +45,7 @@ const Login = ({ onLogin, handlesMap }: LoginProps): JSX.Element => {
           encodedValue: signedChallenge,
           publicKey: selectedAccount,
           challenge,
-        }
+        },
       );
       onLogin({
         address: selectedAccount,
@@ -61,7 +61,7 @@ const Login = ({ onLogin, handlesMap }: LoginProps): JSX.Element => {
   };
 
   const handlesValues = [...handlesMap.values()].filter(
-    ({ handle }) => !!handle
+    ({ handle }) => !!handle,
   );
 
   return (

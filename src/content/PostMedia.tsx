@@ -16,19 +16,19 @@ interface PostMediaProps {
 }
 
 function isImage(
-  attachment: ActivityContentAttachment
+  attachment: ActivityContentAttachment,
 ): attachment is ActivityContentImage {
   return attachment.type.toLowerCase() === "image";
 }
 
 function isVideo(
-  attachment: ActivityContentAttachment
+  attachment: ActivityContentAttachment,
 ): attachment is ActivityContentVideo {
   return attachment.type.toLowerCase() === "video";
 }
 
 function isAudio(
-  attachment: ActivityContentAttachment
+  attachment: ActivityContentAttachment,
 ): attachment is ActivityContentAudio {
   return attachment.type.toLowerCase() === "audio";
 }

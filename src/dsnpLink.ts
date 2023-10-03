@@ -122,7 +122,7 @@ export type AuthMethods = {
   tokenAuth?: r.HttpBearerSecurityAuthentication;
 };
 export function configureAuth(
-  params?: r.CreateContextParams<AuthMethods>["authProviders"]
+  params?: r.CreateContextParams<AuthMethods>["authProviders"],
 ): AuthMethods {
   return {
     tokenAuth:
@@ -131,7 +131,7 @@ export function configureAuth(
   };
 }
 export function createContext<FetcherData>(
-  params?: r.CreateContextParams<AuthMethods, FetcherData>
+  params?: r.CreateContextParams<AuthMethods, FetcherData>,
 ): r.Context<AuthMethods, FetcherData> {
   return new r.Context<AuthMethods, FetcherData>({
     serverConfiguration: new r.ServerConfiguration("http://localhost:5005", {}),
@@ -145,7 +145,7 @@ export function createContext<FetcherData>(
 export async function authChallenge<FetcherData>(
   ctx: r.Context<AuthMethods, FetcherData>,
   params: {},
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<ChallengeResponse> {
   const req = await ctx.createRequest({
     path: "/v1/auth/challenge",
@@ -161,7 +161,7 @@ export async function authChallenge<FetcherData>(
 export async function authProvider<FetcherData>(
   ctx: r.Context<AuthMethods, FetcherData>,
   params: {},
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<ProviderResponse> {
   const req = await ctx.createRequest({
     path: "/v1/auth/provider",
@@ -178,7 +178,7 @@ export async function authLogin<FetcherData>(
   ctx: r.Context<AuthMethods, FetcherData>,
   params: {},
   body: LoginRequest,
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<LoginResponse> {
   const req = await ctx.createRequest({
     path: "/v1/auth/login",
@@ -195,7 +195,7 @@ export async function authLogin<FetcherData>(
 export async function authLogout<FetcherData>(
   ctx: r.Context<AuthMethods, FetcherData>,
   params: {},
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<any> {
   const req = await ctx.createRequest({
     path: "/v1/auth/logout",
@@ -213,7 +213,7 @@ export async function authCreate<FetcherData>(
   ctx: r.Context<AuthMethods, FetcherData>,
   params: {},
   body: CreateIdentityRequest,
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<CreateIdentityResponse> {
   const req = await ctx.createRequest({
     path: "/v1/auth/create",
@@ -230,7 +230,7 @@ export async function authCreate<FetcherData>(
 export async function authAccount<FetcherData>(
   ctx: r.Context<AuthMethods, FetcherData>,
   params: {},
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<AuthAccountResponse | any> {
   const req = await ctx.createRequest({
     path: "/v1/auth/account",
@@ -248,7 +248,7 @@ export async function authHandles<FetcherData>(
   ctx: r.Context<AuthMethods, FetcherData>,
   params: {},
   body: string[],
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<HandlesResponse[]> {
   const req = await ctx.createRequest({
     path: "/v1/auth/handles",
@@ -266,7 +266,7 @@ export async function authDelegate<FetcherData>(
   ctx: r.Context<AuthMethods, FetcherData>,
   params: {},
   body: DelegateRequest,
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<DelegateResponse> {
   const req = await ctx.createRequest({
     path: "/v1/auth/delegate",
@@ -287,7 +287,7 @@ export async function getUserFeed<FetcherData>(
     newestBlockNumber?: number;
     oldestBlockNumber?: number;
   },
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<PaginatedBroadcast> {
   const req = await ctx.createRequest({
     path: "/v1/content/{dsnpId}",
@@ -308,7 +308,7 @@ export async function getFeed<FetcherData>(
     newestBlockNumber?: number;
     oldestBlockNumber?: number;
   },
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<PaginatedBroadcast> {
   const req = await ctx.createRequest({
     path: "/v1/content/feed",
@@ -329,7 +329,7 @@ export async function getDiscover<FetcherData>(
     newestBlockNumber?: number;
     oldestBlockNumber?: number;
   },
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<PaginatedBroadcast> {
   const req = await ctx.createRequest({
     path: "/v1/content/discover",
@@ -348,7 +348,7 @@ export async function createBroadcast<FetcherData>(
   ctx: r.Context<AuthMethods, FetcherData>,
   params: {},
   body: any,
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<BroadcastExtended> {
   const req = await ctx.createRequest({
     path: "/v1/content/create",
@@ -369,7 +369,7 @@ export async function getContent<FetcherData>(
     dsnpId: string;
     contentHash: string;
   },
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<BroadcastExtended> {
   const req = await ctx.createRequest({
     path: "/v1/content/{dsnpId}/{contentHash}",
@@ -390,7 +390,7 @@ export async function editContent<FetcherData>(
     type: string;
   },
   body: EditPostRequest,
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<BroadcastExtended> {
   const req = await ctx.createRequest({
     path: "/v1/content/{type}/{contentHash}",
@@ -410,7 +410,7 @@ export async function userFollowing<FetcherData>(
   params: {
     dsnpId: string;
   },
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<string[]> {
   const req = await ctx.createRequest({
     path: "/v1/graph/{dsnpId}/following",
@@ -429,7 +429,7 @@ export async function graphFollow<FetcherData>(
   params: {
     dsnpId: string;
   },
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<any> {
   const req = await ctx.createRequest({
     path: "/v1/graph/{dsnpId}/follow",
@@ -448,7 +448,7 @@ export async function graphUnfollow<FetcherData>(
   params: {
     dsnpId: string;
   },
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<any> {
   const req = await ctx.createRequest({
     path: "/v1/graph/{dsnpId}/unfollow",
@@ -467,7 +467,7 @@ export async function getProfile<FetcherData>(
   params: {
     dsnpId: string;
   },
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<Profile> {
   const req = await ctx.createRequest({
     path: "/v1/profiles/{dsnpId}",
@@ -487,7 +487,7 @@ export async function createProfile<FetcherData>(
     dsnpId: string;
   },
   body: EditProfileRequest,
-  opts?: FetcherData
+  opts?: FetcherData,
 ): Promise<Profile> {
   const req = await ctx.createRequest({
     path: "/v1/profiles/{dsnpId}",

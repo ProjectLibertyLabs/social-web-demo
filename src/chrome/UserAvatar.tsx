@@ -23,9 +23,9 @@ const UserAvatar = ({ user, avatarSize }: UserAvatarProps): JSX.Element => {
       React.useMemo(
         () =>
           `data:image/svg+xml;utf8,${encodeURIComponent(
-            minidenticon(user.dsnpId.toString())
+            minidenticon(user.dsnpId.toString()),
           )}`,
-        [user.dsnpId]
+        [user.dsnpId],
       )
     : "";
 

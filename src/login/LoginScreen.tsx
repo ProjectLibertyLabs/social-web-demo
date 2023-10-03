@@ -14,17 +14,17 @@ const dsnpLinkCtx = dsnpLink.createContext();
 interface LoginScreenProps {
   onLogin: (
     account: UserAccount,
-    providerInfo: dsnpLink.ProviderResponse
+    providerInfo: dsnpLink.ProviderResponse,
   ) => void;
 }
 
 const toHandlesMap = (
   accountList: InjectedAccountWithMeta[],
-  handles: dsnpLink.HandlesResponse[]
+  handles: dsnpLink.HandlesResponse[],
 ) => {
   const handleOnlyMap = handles.reduce(
     (prev, cur) => (cur.handle ? prev.set(cur.publicKey, cur.handle) : prev),
-    new Map()
+    new Map(),
   );
   const handleMap: HandlesMap = new Map();
   for (const account of accountList) {
@@ -64,7 +64,7 @@ const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
         const accountsWithHandles = await dsnpLink.authHandles(
           dsnpLinkCtx,
           {},
-          allAccounts.map((account) => account.address)
+          allAccounts.map((account) => account.address),
         );
 
         setHandlesMap(toHandlesMap(allAccounts, accountsWithHandles));

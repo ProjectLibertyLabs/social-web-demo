@@ -5,18 +5,18 @@ import App from "./App";
 import ReviewApp from "./ReviewApp";
 
 const root = ReactDOM.createRoot(
-  document.getElementById("root") as HTMLElement
+  document.getElementById("root") as HTMLElement,
 );
 if (document.location.pathname.endsWith("/review")) {
-root.render(
-  <React.StrictMode>
-    <ReviewApp />
-  </React.StrictMode>
-);
+  root.render(
+    <React.StrictMode>
+      <ReviewApp />
+    </React.StrictMode>,
+  );
 } else {
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
 }
