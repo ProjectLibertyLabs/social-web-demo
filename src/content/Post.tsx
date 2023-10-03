@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Card, Spin } from "antd";
 import UserAvatar from "../chrome/UserAvatar";
 import PostMedia from "./PostMedia";
+import PostTags from "./PostTags";
 import RelativeTime from "../helpers/RelativeTime";
 import ReplyBlock from "./ReplyBlock";
 import PostHashDropdown from "./PostHashDropdown";
@@ -9,6 +10,7 @@ import { FromTitle } from "./FromTitle";
 import {
   ActivityContentNote,
   ActivityContentAttachment,
+  ActivityContentTag,
 } from "@dsnp/activity-content/types";
 import { Anchorme } from "react-anchorme";
 import * as dsnpLink from "../dsnpLink";
@@ -38,6 +40,7 @@ const Post = ({
   // TODO: validate content as ActivityContentNote or have DSNP Link do it
 
   const attachments: ActivityContentAttachment[] = content.attachment || [];
+  const tags: ActivityContentTag[] = content.tag as ActivityContentTag[] || [];
 
   return (
     <Card key={feedItem.contentHash} className={styles.root} bordered={false}>
@@ -72,6 +75,7 @@ const Post = ({
             </div>
           )}
           {content?.attachment && <PostMedia attachments={attachments} />}
+          {content?.tag && <PostTags tags={tags} user={user} />}
         </>
         <ReplyBlock
           parentURI={buildDSNPContentURI(
