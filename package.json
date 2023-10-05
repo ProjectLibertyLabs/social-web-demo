@@ -4,7 +4,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.1.4",
     "@dhaiwat10/react-link-preview": "^1.15.0",
-    "@dsnp/activity-content": "github:LibertyDSNP/activity-content#verified-interaction-poc",
+    "@dsnp/activity-content": "../activity-content/dist",
     "@polkadot/extension-dapp": "^0.46.4",
     "@polkadot/util": "^12.2.2",
     "@types/react": "^18.2.9",
