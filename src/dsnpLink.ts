@@ -118,6 +118,42 @@ export type Profile = {
 export type EditProfileRequest = {
     content: string;
 };
+export type InteractionRequest = {
+    attributeSetType: string;
+    interactionId: string;
+    href: string;
+    reference: any;
+};
+/**
+ * Either a string, or an array containing strings and objects with string values
+ */
+export type JsonLdContext = string | (string | {
+    [key: string]: string;
+})[];
+export type VerifiableCredentialWithoutProof = {
+    '@context': JsonLdContext;
+    type: string[];
+    issuer: string;
+    issuanceDate: string;
+    credentialSchema: {
+        type: 'VerifiableCredentialSchema2023';
+        /**
+         * URL of schema verifiable credential
+         */
+        id: string;
+    };
+    credentialSubject: {
+        interactionId: string;
+        href?: string;
+        reference: any;
+    };
+};
+export type VerifiableCredentialWithEd25519Proof = VerifiableCredentialWithoutProof;
+export type InteractionTicket = VerifiableCredentialWithoutProof;
+export type InteractionResponse = {
+    attributeSetType: string;
+    ticket: InteractionTicket;
+};
 export type AuthMethods = {
     tokenAuth?: r.HttpBearerSecurityAuthentication;
 };
@@ -125,7 +161,7 @@ export function configureAuth(params?: r.CreateContextParams<AuthMethods>["authP
     return { tokenAuth: params?.tokenAuth && new r.HttpBearerSecurityAuthentication(params.tokenAuth) };
 }
 export function createContext<FetcherData>(params?: r.CreateContextParams<AuthMethods, FetcherData>): r.Context<AuthMethods, FetcherData> { return new r.Context<AuthMethods, FetcherData>({
-    serverConfiguration: new r.ServerConfiguration('http://192.168.4.115:5005', {}),
+    serverConfiguration: new r.ServerConfiguration('http://localhost:5005', {}),
     authMethods: configureAuth(params?.authProviders),
     ...params
 }); }
@@ -162,6 +198,19 @@ export async function authLogin<FetcherData>(ctx: r.Context<AuthMethods, Fetcher
         params,
         method: r.HttpMethod.POST,
         body
+    });
+    const res = await ctx.sendRequest(req, opts);
+    return ctx.handleResponse(res, {});
+}
+/**
+ * Returns 204 No Content if the caller's token is valid, 401 Unauthorized if not
+ */
+export async function authAssert<FetcherData>(ctx: r.Context<AuthMethods, FetcherData>, params: {}, opts?: FetcherData): Promise<any> {
+    const req = await ctx.createRequest({
+        path: '/v1/auth/assert',
+        params,
+        method: r.HttpMethod.POST,
+        auth: ["tokenAuth"]
     });
     const res = await ctx.sendRequest(req, opts);
     return ctx.handleResponse(res, {});
@@ -293,6 +342,29 @@ export async function getDiscover<FetcherData>(ctx: r.Context<AuthMethods, Fetch
     return ctx.handleResponse(res, {});
 }
 /**
+ * Get the feed of posts with interaction tags of a given attribute set type and URL, paginated.
+ */
+export async function getInteractionsFeed<FetcherData>(ctx: r.Context<AuthMethods, FetcherData>, params: {
+    newestBlockNumber?: number;
+    oldestBlockNumber?: number;
+    rel?: string;
+    href?: string;
+}, opts?: FetcherData): Promise<PaginatedBroadcast> {
+    const req = await ctx.createRequest({
+        path: '/v1/content/interactions',
+        params,
+        method: r.HttpMethod.GET,
+        queryParams: [
+            "newestBlockNumber",
+            "oldestBlockNumber",
+            "rel",
+            "href"
+        ]
+    });
+    const res = await ctx.sendRequest(req, opts);
+    return ctx.handleResponse(res, {});
+}
+/**
  * Create a new post
  */
 export async function createBroadcast<FetcherData>(ctx: r.Context<AuthMethods, FetcherData>, params: {}, body: any, opts?: FetcherData): Promise<BroadcastExtended> {
@@ -411,6 +483,19 @@ export async function createProfile<FetcherData>(ctx: r.Context<AuthMethods, Fet
         method: r.HttpMethod.PUT,
         body,
         auth: ["tokenAuth"]
+    });
+    const res = await ctx.sendRequest(req, opts);
+    return ctx.handleResponse(res, {});
+}
+/**
+ * Request attestation for a pseudonymous interaction claim
+ */
+export async function submitInteraction<FetcherData>(ctx: r.Context<AuthMethods, FetcherData>, params: {}, body: InteractionRequest, opts?: FetcherData): Promise<InteractionResponse> {
+    const req = await ctx.createRequest({
+        path: '/v1/interactions',
+        params,
+        method: r.HttpMethod.POST,
+        body
     });
     const res = await ctx.sendRequest(req, opts);
     return ctx.handleResponse(res, {});

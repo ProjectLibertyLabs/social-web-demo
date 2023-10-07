@@ -18,7 +18,6 @@ interface NewReviewProps {
 
 type NewReviewValues = {
   message: string;
-  test: string;
   images: UploadFile[];
 };
 

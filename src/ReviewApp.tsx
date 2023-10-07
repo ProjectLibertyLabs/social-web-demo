@@ -17,7 +17,7 @@ import { setIpfsGateway } from "./service/IpfsService";
 import AuthErrorBoundary from "./AuthErrorBoundary";
 import NewReview from "./content/NewReview";
 
-const App = (): JSX.Element => {
+const ReviewApp = (): JSX.Element => {
   const _fakeUser = {
     address: "0x",
     expiresIn: 100,
@@ -29,26 +29,15 @@ const App = (): JSX.Element => {
     undefined,
     "user-account",
   );
-  const [feedUser, setFeedUser] = useState<User | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [isPosting, setIsPosting] = useState<boolean>(false);
-  const [accountFollowing, setAccountFollowing] = useState<string[] | null>(
-    null,
-  );
   const [network, setNetwork] = useState<Network>("testnet");
 
-  const refreshFollowing = async (account: UserAccount) => {
-    const userAccountFollows = await dsnpLink.userFollowing(getContext(), {
-      dsnpId: account.dsnpId,
-    });
-    setAccountFollowing(userAccountFollows);
-  };
-
-  useEffect(() => {
-    if (userAccount) {
-      refreshFollowing(userAccount);
-    }
-  }, [userAccount]);
+  // Test if session is still valid
+  React.useEffect(() => {
+    dsnpLink.authAssert(getContext(), {})
+      .catch((e) => { setUserAccount(undefined); });
+  });
 
   if (userAccount) {
     setAccessToken(userAccount.accessToken, userAccount.expires);
@@ -63,30 +52,11 @@ const App = (): JSX.Element => {
     providerInfo.ipfsGateway && setIpfsGateway(providerInfo.ipfsGateway);
     setNetwork(providerInfo.network);
     setUserAccount(account);
-    refreshFollowing(account);
     setLoading(false);
   };
 
   const handleLogout = () => {
     setUserAccount(undefined);
-  };
-
-  const goToProfile = async (dsnpId?: string) => {
-    setLoading(true);
-    if (dsnpId) {
-      const profile =
-        userAccount.dsnpId === dsnpId
-          ? userAccount
-          : await getUserProfile(dsnpId);
-      setFeedUser(profile || undefined);
-    } else {
-      setFeedUser(undefined);
-    }
-    setLoading(false);
-  };
-
-  const triggerGraphRefresh = () => {
-    setTimeout(() => refreshFollowing(userAccount), 14_000);
   };
 
   return (
@@ -136,4 +106,4 @@ const App = (): JSX.Element => {
   );
 };
 
-export default App;
+export default ReviewApp;
