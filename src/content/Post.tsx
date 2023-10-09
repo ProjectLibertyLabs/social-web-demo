@@ -76,7 +76,12 @@ const Post = ({
             </div>
           )}
           {content?.attachment && <PostMedia attachments={attachments} />}
-          {content?.tag && <PostTags tags={tags} user={user} />}
+          {content?.tag && (
+            <PostTags
+              tags={tags}
+              verifiedInteractions={feedItem.verifiedInteractions}
+            />
+          )}
         </>
         <ReplyBlock
           parentURI={buildDSNPContentURI(

@@ -1,41 +1,31 @@
 import * as r from "@typoas/runtime";
 import React from "react";
-import { Button, Modal, Input, Form } from "antd";
-import UserAvatar from "../chrome/UserAvatar";
-import NewPostImageUpload from "./NewPostImageUpload";
-import CachedLinkPreview from "./CachedLinkPreview";
+import { Modal } from "antd";
 import type { User } from "../types";
 import type { UploadFile } from "antd/es/upload/interface";
 import * as dsnpLink from "../dsnpLink";
 import { getContext } from "../service/AuthService";
 import { makeInteractionIdAndNonce } from "../service/CredentialService";
 
-interface NewReviewProps {
-  onSuccess: () => void;
-  onCancel: () => void;
+interface ReviewProcessorProps {
   account: User;
 }
 
-type NewReviewValues = {
+type ReviewProcessorValues = {
   message: string;
   images: UploadFile[];
 };
 
-const NewReview = ({
-  onSuccess,
-  onCancel,
-  account,
-}: NewReviewProps): JSX.Element => {
-  const [form] = Form.useForm();
+const ReviewProcessor = ({ account }: ReviewProcessorProps): JSX.Element => {
   const [saving, setSaving] = React.useState<boolean>(false);
-  const [interactionTicket, setInteractionTicket] = React.useState<any>({});
-  const [nonce, setNonce] = React.useState<string>("z");
   const [open, setOpen] = React.useState<boolean>(true);
+
+  let interactionTicket: any | null = null;
+  let nonce: string | null = null;
 
   const success = () => {
     setSaving(false);
     setOpen(false);
-    onSuccess();
   };
 
   if (!location.search || !location.search.startsWith("?")) {
@@ -45,43 +35,63 @@ const NewReview = ({
   const href = params.get("href") || "";
   const attributeSetType = params.get("attributeSetType") || "";
   const reviewText = params.get("text") || "";
+  const successUrl = params.get("success_url") || "";
+  const errorUrl = params.get("error_url") || "";
 
   const getInteractionTicket = async () => {
     if (location.search && location.search.startsWith("?")) {
       const params = new URLSearchParams(location.search.substring(1));
       // Generate an interaction Id
-      const { interactionId, nonce } = makeInteractionIdAndNonce(
+      const { interactionId, nonce: nonceStr } = makeInteractionIdAndNonce(
         account.dsnpId,
       );
-      setNonce(nonce);
+      nonce = nonceStr;
       const reference = JSON.parse(params.get("reference") || "{}");
 
       // submit these to get a ticket
-      const ctx = getContext();
-      const req = await ctx.createRequest({
-        path: "/v1/interactions",
-        params: {},
-        method: r.HttpMethod.POST,
-        auth: ["tokenAuth"],
-        body: { href, attributeSetType, interactionId, reference },
-      });
-      const res = await ctx.sendRequest(req);
-      const json = await res.body.json();
+      const json = await dsnpLink.submitInteraction(
+        getContext(),
+        {},
+        { href, attributeSetType, interactionId, reference },
+      );
       return json;
     }
   };
 
-  React.useEffect(() => {
-    getInteractionTicket().then((interactionResponse) => {
-      if (interactionResponse.attributeSetType !== attributeSetType) {
-        // TODO handle this error
-      } else {
-        setInteractionTicket(interactionResponse.ticket);
-      }
-    });
-  }, []);
+  const doSubmit = () => {
+    getInteractionTicket()
+      .then((interactionResponse) => {
+        if (
+          !interactionResponse ||
+          interactionResponse.attributeSetType !== attributeSetType
+        ) {
+          doRedirect(errorUrl);
+        } else {
+          interactionTicket = interactionResponse.ticket;
+          createPost({
+            message: reviewText,
+            images: [],
+          })
+            .then(() => {
+              // Redirect back to application
+              doRedirect(successUrl);
+            })
+            .catch((e) => {
+              // Redirect to error
+              doRedirect(errorUrl);
+            });
+        }
+      })
+      .catch((e) => {
+        doRedirect(errorUrl);
+      });
+  };
 
-  const createPost = async (formValues: NewReviewValues) => {
+  const doRedirect = (url: string) => {
+    window.location.replace(url);
+  };
+
+  const createPost = async (formValues: ReviewProcessorValues) => {
     try {
       const body = new FormData();
       body.append("content", formValues.message);
@@ -102,7 +112,7 @@ const NewReview = ({
       );
       const resp = await dsnpLink.createBroadcast(getContext(), {}, body);
       console.log("postActivityContentCreated", { resp });
-      success();
+      //success();
     } catch (e) {
       console.error(e);
       setSaving(false);
@@ -113,39 +123,20 @@ const NewReview = ({
 
   return (
     <Modal
-      title="New Review"
+      title="Post your review"
       open={open}
       onCancel={
         () => {
           setOpen(false);
+          doRedirect(errorUrl);
         } /* onCancel */
       }
-      footer={null}
+      onOk={doSubmit}
       centered={true}
     >
-      <Form form={form} onFinish={createPost}>
-        <Form.Item>
-          <UserAvatar user={account} avatarSize={"medium"} />
-          Posting as @{account.handle}
-        </Form.Item>
-        <Form.Item name="message" required={true}>
-          <Input.TextArea rows={4} placeholder={"Enter your review"} />
-        </Form.Item>
-        <CachedLinkPreview url={href} />
-        <NewPostImageUpload
-          onChange={(fileList) => {
-            form.setFieldsValue({ images: fileList });
-            form.validateFields(["images"]);
-          }}
-        />
-        <Form.Item>
-          <Button type="primary" htmlType="submit" loading={saving}>
-            Post
-          </Button>
-        </Form.Item>
-      </Form>
+      Your review will be posted as {account.handle}.
     </Modal>
   );
 };
 
-export default NewReview;
+export default ReviewProcessor;

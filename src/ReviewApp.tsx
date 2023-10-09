@@ -16,6 +16,7 @@ import { HeaderProfile } from "./chrome/HeaderProfile";
 import { setIpfsGateway } from "./service/IpfsService";
 import AuthErrorBoundary from "./AuthErrorBoundary";
 import NewReview from "./content/NewReview";
+import ReviewProcessor from "./content/ReviewProcessor";
 
 const ReviewApp = (): JSX.Element => {
   const _fakeUser = {
@@ -35,13 +36,23 @@ const ReviewApp = (): JSX.Element => {
 
   // Test if session is still valid
   React.useEffect(() => {
-    dsnpLink.authAssert(getContext(), {})
-      .catch((e) => { setUserAccount(undefined); });
+    dsnpLink.authAssert(getContext(), {}).catch((e) => {
+      setUserAccount(undefined);
+    });
   });
 
   if (userAccount) {
     setAccessToken(userAccount.accessToken, userAccount.expires);
   }
+
+  // TODO probably an easier way to read query params
+  if (!location.search || !location.search.startsWith("?")) {
+    return <div>Must specify query string</div>;
+  }
+  const params = new URLSearchParams(location.search.substring(1));
+  const hasReviewText: boolean = params.get("text")
+    ? params.get("text") !== ""
+    : false;
 
   const handleLogin = async (
     account: UserAccount,
@@ -83,18 +94,21 @@ const ReviewApp = (): JSX.Element => {
               <Row>
                 <Col sm={24} md={12} lg={24 - 8}>
                   <AuthErrorBoundary onError={handleLogout}>
-                    <NewReview
-                      onSuccess={() => {
-                        setIsPosting(true);
-                        setTimeout(() => {
-                          setIsPosting(false);
-                        }, 14_000);
-                      }}
-                      onCancel={() => {
-                        /*FIXME*/
-                      }}
-                      account={userAccount}
-                    />
+                    {!hasReviewText && (
+                      <NewReview
+                        onSuccess={() => {
+                          setIsPosting(true);
+                          setTimeout(() => {
+                            setIsPosting(false);
+                          }, 14_000);
+                        }}
+                        onCancel={() => {
+                          /*FIXME*/
+                        }}
+                        account={userAccount}
+                      />
+                    )}
+                    {hasReviewText && <ReviewProcessor account={userAccount} />}
                   </AuthErrorBoundary>
                 </Col>
               </Row>

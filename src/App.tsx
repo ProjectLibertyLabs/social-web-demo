@@ -44,9 +44,15 @@ const App = (): JSX.Element => {
 
   useEffect(() => {
     if (userAccount) {
-      dsnpLink.authAssert(getContext(), {})
-        .then((x) => { refreshFollowing(userAccount); })
-        .catch((e) => { console.log("got an error", e); setUserAccount(undefined); });
+      dsnpLink
+        .authAssert(getContext(), {})
+        .then((x) => {
+          refreshFollowing(userAccount);
+        })
+        .catch((e) => {
+          console.log("got an error", e);
+          setUserAccount(undefined);
+        });
     }
   }, [userAccount]);
 
