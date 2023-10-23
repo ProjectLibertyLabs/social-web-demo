@@ -342,6 +342,27 @@ export async function getDiscover<FetcherData>(
   return ctx.handleResponse(res, {});
 }
 /**
+ * Get live feed from gateway
+ */
+export async function getLiveFeed<FetcherData>(
+  ctx: r.Context<AuthMethods, FetcherData>,
+  params: {
+    newestBlockNumber?: number;
+    oldestBlockNumber?: number;
+  },
+  opts?: FetcherData
+): Promise<PaginatedBroadcast> {
+  const req = await ctx.createRequest({
+    path: "/v1/content/live",
+    params,
+    method: r.HttpMethod.GET,
+    queryParams: [],
+    auth: ["tokenAuth"],
+  });
+  const res = await ctx.sendRequest(req, opts);
+  return ctx.handleResponse(res, {});
+}
+/**
  * Create a new post
  */
 export async function createBroadcast<FetcherData>(

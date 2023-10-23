@@ -28,6 +28,7 @@ export enum FeedTypes {
   DISCOVER,
   DISPLAY_ID_POSTS,
   MY_POSTS,
+  LIVE_FEED,
 }
 
 export type HexString = string;

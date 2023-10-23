@@ -22,7 +22,7 @@ const Feed = ({
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isPosting, setIsPosting] = useState<boolean>(false);
   const [refreshTrigger, setRefreshTrigger] = useState<number>(Date.now());
-  const [feedType, setFeedType] = useState<FeedTypes>(FeedTypes.DISCOVER);
+  const [feedType, setFeedType] = useState<FeedTypes>(FeedTypes.LIVE_FEED);
 
   if (
     feedType === FeedTypes.DISPLAY_ID_POSTS &&
@@ -32,7 +32,7 @@ const Feed = ({
   }
 
   if (feedType === FeedTypes.DISPLAY_ID_POSTS && !user) {
-    setFeedType(FeedTypes.DISCOVER);
+    setFeedType(FeedTypes.LIVE_FEED);
   }
 
   const feedNavClassName = (navItemType: FeedTypes) =>
@@ -41,7 +41,7 @@ const Feed = ({
       : styles.navigationItem;
 
   const resetFeed = () => {
-    setFeedType(FeedTypes.DISCOVER);
+    setFeedType(FeedTypes.LIVE_FEED);
     goToProfile();
   };
 
@@ -49,7 +49,7 @@ const Feed = ({
     if (dsnpId) {
       setFeedType(FeedTypes.DISPLAY_ID_POSTS);
     } else {
-      setFeedType(FeedTypes.DISCOVER);
+      setFeedType(FeedTypes.LIVE_FEED);
     }
 
     goToProfile(dsnpId);
@@ -78,8 +78,8 @@ const Feed = ({
               </>
             )}
           <div
-            className={feedNavClassName(FeedTypes.DISCOVER)}
-            onClick={() => setFeedType(FeedTypes.DISCOVER)}
+            className={feedNavClassName(FeedTypes.LIVE_FEED)}
+            onClick={() => setFeedType(FeedTypes.LIVE_FEED)}
           >
             Discover
           </div>

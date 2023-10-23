@@ -128,6 +128,13 @@ const PostList = ({
           priorFeed
         );
         return;
+      case FeedTypes.LIVE_FEED:
+        postGetPosts(
+          await dsnpLink.getLiveFeed(getContext(), params),
+          appendOrPrepend,
+          priorFeed
+        );
+        return;
       case FeedTypes.DISPLAY_ID_POSTS:
       case FeedTypes.MY_POSTS:
         if (!user) return resetFeed();
