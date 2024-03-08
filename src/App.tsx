@@ -26,12 +26,12 @@ const App = (): JSX.Element => {
   };
   const [userAccount, setUserAccount] = useStickyState<UserAccount | undefined>(
     undefined,
-    "user-account"
+    "user-account",
   );
   const [feedUser, setFeedUser] = useState<User | undefined>();
   const [loading, setLoading] = useState<boolean>(false);
   const [accountFollowing, setAccountFollowing] = useState<string[] | null>(
-    null
+    null,
   );
   const [network, setNetwork] = useState<Network>("testnet");
 
@@ -54,7 +54,7 @@ const App = (): JSX.Element => {
 
   const handleLogin = async (
     account: UserAccount,
-    providerInfo: dsnpLink.ProviderResponse
+    providerInfo: dsnpLink.ProviderResponse,
   ) => {
     setLoading(true);
     setAccessToken(account.accessToken, account.expires);

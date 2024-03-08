@@ -37,30 +37,30 @@ const PostList = ({
     React.useState<number>(refreshTrigger);
   const [priorFeedType, setPriorFeedType] = React.useState<number>(feedType);
   const [newestBlockNumber, setNewestBlockNumber] = React.useState<
-    number | undefined
-  >(undefined);
+    number | null
+  >(null);
   const [oldestBlockNumber, setOldestBlockNumber] = React.useState<
-    number | undefined
-  >(undefined);
+    number | null
+  >(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [currentFeed, setCurrentFeed] = React.useState<FeedItem[]>([]);
 
   const postGetPosts = (
     result: dsnpLink.PaginatedBroadcast,
     appendOrPrepend: "append" | "prepend",
-    priorFeed: FeedItem[]
+    priorFeed: FeedItem[],
   ) => {
     setOldestBlockNumber(
       Math.min(
         oldestBlockNumber || result.oldestBlockNumber,
-        result.oldestBlockNumber
-      )
+        result.oldestBlockNumber,
+      ),
     );
     setNewestBlockNumber(
       Math.max(
         newestBlockNumber || result.newestBlockNumber,
-        result.newestBlockNumber
-      )
+        result.newestBlockNumber,
+      ),
     );
     if (appendOrPrepend === "append") {
       // Older stuff
@@ -98,8 +98,8 @@ const PostList = ({
           oldestBlockNumber: getOlder
             ? undefined
             : newestBlockNumber
-            ? newestBlockNumber + 1
-            : undefined,
+              ? newestBlockNumber + 1
+              : undefined,
           // Going back in time should start at our oldest, but going forward is undefined
           newestBlockNumber: getOlder
             ? oldestBlockNumber
@@ -118,14 +118,14 @@ const PostList = ({
         postGetPosts(
           await dsnpLink.getFeed(getContext(), params),
           appendOrPrepend,
-          priorFeed
+          priorFeed,
         );
         return;
       case FeedTypes.DISCOVER:
         postGetPosts(
           await dsnpLink.getDiscover(getContext(), params),
           appendOrPrepend,
-          priorFeed
+          priorFeed,
         );
         return;
       case FeedTypes.DISPLAY_ID_POSTS:
@@ -137,7 +137,7 @@ const PostList = ({
             ...params,
           }),
           appendOrPrepend,
-          priorFeed
+          priorFeed,
         );
         return;
     }

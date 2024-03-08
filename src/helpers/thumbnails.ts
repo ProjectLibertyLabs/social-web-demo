@@ -1,6 +1,6 @@
 export const getThumbnailUrl = (url: string): string => {
   const isYoutubeVideo = url.match(
-    /\/\/((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w]+)(\S+)?$/i
+    /\/\/((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w]+)(\S+)?$/i,
   );
   if (isYoutubeVideo)
     return "https://img.youtube.com/vi/" + isYoutubeVideo[4] + "/mqdefault.jpg";
