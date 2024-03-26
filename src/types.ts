@@ -1,10 +1,8 @@
-import type { InjectedAccountWithMeta } from "@polkadot/extension-inject/types";
 import type { ProviderResponse } from "./dsnpLink";
 
 export type Network = ProviderResponse["network"];
 
 export type UserAccount = {
-  address: string;
   expires: number;
   accessToken: string;
 } & User;
@@ -17,11 +15,6 @@ export type User = {
     name: string;
   };
 };
-
-export type HandlesMap = Map<
-  string,
-  { handle: string | null; account: InjectedAccountWithMeta }
->;
 
 export enum FeedTypes {
   MY_FEED,

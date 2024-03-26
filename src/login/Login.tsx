@@ -1,58 +1,92 @@
 import React, { useState } from "react";
-import { Button, Select, Spin, Form } from "antd";
+import { Button, Spin, Form } from "antd";
 import Title from "antd/es/typography/Title";
+import { getLoginOrRegistrationPayload, setConfig } from "@amplica-labs/siwf";
 
 import * as dsnpLink from "../dsnpLink";
-import { HandlesMap, UserAccount } from "../types";
-import { signPayloadWithExtension } from "./signing";
+import { UserAccount } from "../types";
 import styles from "./Login.module.css";
-import { getContext } from "../service/AuthService";
+import { getContext, setAccessToken } from "../service/AuthService";
 
 interface LoginProps {
-  handlesMap: HandlesMap;
   onLogin: (account: UserAccount) => void;
+  providerId: string;
+  nodeUrl: string;
+  siwfUrl: string;
 }
 
-const Login = ({ onLogin, handlesMap }: LoginProps): JSX.Element => {
-  const [selectedAccount, setSelectedAccount] = useState<string>("");
+const Login = ({ onLogin, providerId, nodeUrl, siwfUrl }: LoginProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!selectedAccount) return;
-    const handle = handlesMap.get(selectedAccount)?.handle;
-    if (!handle) return;
     setIsLoading(true);
 
     try {
-      const dsnpLinkCtx = getContext();
-      const { challenge } = await dsnpLink.authChallenge(dsnpLinkCtx, {});
+      setConfig({
+        providerId,
+        // The url where Wallet-Proxy lives
+        proxyUrl: siwfUrl,
+        // The Frequency RPC endpoint
+        frequencyRpcUrl: nodeUrl,
+        siwsOptions: {
+          // The expiration for the SIWS payload.
+          expiresInMsecs: 60_000,
+        },
+        // The Schema name that permissions are being requested.
+        // A specified version can be set using the ID attribute.
+        // If set to 0 it grabs the latest version for the schema.
+        schemas: [
+          { name: "broadcast" },
+          { name: "reply" },
+          { name: "reaction" },
+          { name: "profile" },
+          { name: "tombstone" },
+          { name: "update" },
+          { name: "public-follows" },
+        ],
+      });
 
-      const signedChallenge = await signPayloadWithExtension(
-        selectedAccount,
-        challenge
+      const response = await getLoginOrRegistrationPayload();
+
+      const dsnpLinkNoTokenCtx = getContext();
+      const { accessToken, expires } = await dsnpLink.authLogin2(
+        dsnpLinkNoTokenCtx,
+        {},
+        response as dsnpLink.WalletLoginRequest,
       );
+      setAccessToken(accessToken, expires);
+      const dsnpLinkCtx = getContext();
 
-      if (!signedChallenge.startsWith("0x")) {
-        throw Error("Unable to sign: " + signedChallenge);
+      // We have to poll for the account creation
+      let accountResp: dsnpLink.AuthAccountResponse | null = null;
+      const getDsnpAndHandle = async (timeout: number): Promise<null | dsnpLink.AuthAccountResponse> =>
+        new Promise((resolve) => {
+          setTimeout(async () => {
+            const resp = await dsnpLink.authAccount(dsnpLinkCtx, {});
+            // Handle the 202 response
+            if (resp.size === 0) {
+              resolve(null);
+            } else {
+              resolve(resp);
+            }
+          }, timeout);
+        });
+      accountResp = await getDsnpAndHandle(0);
+      let tries = 1;
+      while (accountResp === null && tries < 10) {
+        console.log("Waiting another 3 seconds before getting the account again...");
+        accountResp = await getDsnpAndHandle(3_000);
+        tries++;
+      }
+      if (accountResp === null) {
+        throw new Error("Account Creation timed out");
       }
 
-      const { accessToken, expires, dsnpId } = await dsnpLink.authLogin(
-        dsnpLinkCtx,
-        {},
-        {
-          algo: "SR25519",
-          encoding: "hex",
-          encodedValue: signedChallenge,
-          publicKey: selectedAccount,
-          challenge,
-        }
-      );
       onLogin({
-        address: selectedAccount,
-        handle,
-        accessToken,
+        handle: accountResp.displayHandle || "Anonymous",
         expires,
-        dsnpId,
+        accessToken,
+        dsnpId: accountResp.dsnpId,
       });
     } catch (e) {
       console.error(e);
@@ -60,31 +94,15 @@ const Login = ({ onLogin, handlesMap }: LoginProps): JSX.Element => {
     }
   };
 
-  const handlesValues = [...handlesMap.values()].filter(
-    ({ handle }) => !!handle
-  );
-
   return (
     <div className={styles.root}>
-      <Title level={2}>Use Existing Social Web Identity</Title>
+      <Title level={2}>Login / Signup to Get Started</Title>
       <div>
         <Form layout="vertical" size="large">
           <Spin tip="Loading" size="large" spinning={isLoading}>
             <Form.Item label="">
-              <Select<string>
-                disabled={handlesValues.length === 0}
-                onChange={setSelectedAccount}
-                placeholder="Select Account"
-                options={handlesValues.map(({ account, handle }) => ({
-                  value: account.address,
-                  label: handle,
-                }))}
-              />
-            </Form.Item>
-
-            <Form.Item label="">
               <Button type="primary" onClick={handleLogin}>
-                Login
+                Signup / Login with Frequency
               </Button>
             </Form.Item>
           </Spin>
