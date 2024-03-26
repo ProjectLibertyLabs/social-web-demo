@@ -33,14 +33,32 @@ const NewPost = ({
   };
 
   const createPost = async (formValues: NewPostValues) => {
+    console.log("formValues", formValues);
     try {
       const body = new FormData();
+      const v2Body = new FormData();
       body.append("content", formValues.message);
       (formValues.images || []).forEach((upload) => {
-        if (upload.originFileObj) body.append("images", upload.originFileObj);
+        if (upload.originFileObj) {
+          body.append("images", upload.originFileObj);
+          v2Body.append("files", upload.originFileObj);
+        }
       });
-      const resp = await dsnpLink.createBroadcast(getContext(), {}, body);
-      console.log("postActivityContentCreated", { resp });
+
+
+      console.log("getContext", getContext());
+      const assetResp = await dsnpLink.uploadAsset(getContext(), {}, v2Body);
+      const respV2 = await dsnpLink.createBroadcastV2(
+        getContext(),
+        {},
+        {
+          content: formValues.message,
+          assets: assetResp.assetIds,
+        }
+      );
+      console.log("assetRd", assetResp);
+      // const resp = await dsnpLink.createBroadcast(getContext(), {}, body);
+      // console.log("postActivityContentCreated", { resp });
       success();
     } catch (e) {
       console.error(e);

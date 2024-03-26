@@ -40,11 +40,14 @@ const NewPostImageUpload = ({
   };
 
   const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => {
+    console.log("fileList", fileList);
+    console.log("newFileList", newFileList);
     setFileList(newFileList);
     onChange(newFileList);
   };
 
   const handleUpload: UploadProps["customRequest"] = (options) => {
+    console.log("handle upload");
     const { file, onSuccess, onError } = options;
     const reader = new FileReader();
     reader.onload = () => {
@@ -55,6 +58,8 @@ const NewPostImageUpload = ({
       onError?.(new Error("Failed to read file"));
     };
     reader.readAsDataURL(file as any);
+    console.log("file", file);
+    console.log("reader", reader);
   };
 
   return (
