@@ -15,7 +15,12 @@ interface LoginProps {
   siwfUrl: string;
 }
 
-const Login = ({ onLogin, providerId, nodeUrl, siwfUrl }: LoginProps): JSX.Element => {
+const Login = ({
+  onLogin,
+  providerId,
+  nodeUrl,
+  siwfUrl,
+}: LoginProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
@@ -59,7 +64,9 @@ const Login = ({ onLogin, providerId, nodeUrl, siwfUrl }: LoginProps): JSX.Eleme
 
       // We have to poll for the account creation
       let accountResp: dsnpLink.AuthAccountResponse | null = null;
-      const getDsnpAndHandle = async (timeout: number): Promise<null | dsnpLink.AuthAccountResponse> =>
+      const getDsnpAndHandle = async (
+        timeout: number,
+      ): Promise<null | dsnpLink.AuthAccountResponse> =>
         new Promise((resolve) => {
           setTimeout(async () => {
             const resp = await dsnpLink.authAccount(dsnpLinkCtx, {});
@@ -74,7 +81,9 @@ const Login = ({ onLogin, providerId, nodeUrl, siwfUrl }: LoginProps): JSX.Eleme
       accountResp = await getDsnpAndHandle(0);
       let tries = 1;
       while (accountResp === null && tries < 10) {
-        console.log("Waiting another 3 seconds before getting the account again...");
+        console.log(
+          "Waiting another 3 seconds before getting the account again...",
+        );
         accountResp = await getDsnpAndHandle(3_000);
         tries++;
       }

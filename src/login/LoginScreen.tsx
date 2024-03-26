@@ -8,7 +8,10 @@ import styles from "./LoginScreen.module.css";
 const dsnpLinkCtx = dsnpLink.createContext();
 
 interface LoginScreenProps {
-  onLogin: (account: UserAccount, providerInfo: dsnpLink.ProviderResponse) => void;
+  onLogin: (
+    account: UserAccount,
+    providerInfo: dsnpLink.ProviderResponse,
+  ) => void;
 }
 
 const LoginScreen = ({ onLogin }: LoginScreenProps): JSX.Element => {
