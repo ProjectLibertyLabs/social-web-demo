@@ -92,7 +92,7 @@ export const convertToDSNPUserURI = (value: unknown): DSNPUserURI => {
  */
 export const buildDSNPContentURI = (
   userIdOrUri: DSNPUserId | DSNPUserURI,
-  contentHash: HexString
+  contentHash: HexString,
 ): DSNPContentURI => {
   return `dsnp://${convertToDSNPUserId(userIdOrUri)}/${contentHash}`;
 };

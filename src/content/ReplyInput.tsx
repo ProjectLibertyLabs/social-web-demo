@@ -13,7 +13,7 @@ const ReplyInput = ({ parentURI: parent }: ReplyInputProps): JSX.Element => {
   const [replyValue, setReplyValue] = useState<string>("");
 
   const createReply = async (
-    event: React.KeyboardEvent<HTMLTextAreaElement>
+    event: React.KeyboardEvent<HTMLTextAreaElement>,
   ) => {
     event.preventDefault();
     setSaving(true);

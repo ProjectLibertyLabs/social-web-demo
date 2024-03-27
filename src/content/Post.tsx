@@ -76,7 +76,7 @@ const Post = ({
         <ReplyBlock
           parentURI={buildDSNPContentURI(
             BigInt(feedItem.fromId),
-            feedItem.contentHash
+            feedItem.contentHash,
           )}
           showReplyInput={showReplyInput}
           goToProfile={goToProfile}

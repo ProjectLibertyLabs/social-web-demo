@@ -65,7 +65,7 @@ const Feed = ({
         <nav className={styles.navigation}>
           {user &&
             [FeedTypes.DISPLAY_ID_POSTS, FeedTypes.MY_POSTS].includes(
-              feedType
+              feedType,
             ) && (
               <>
                 <div className={styles.backArrow} onClick={() => resetFeed()}>

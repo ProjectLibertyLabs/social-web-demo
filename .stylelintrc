@@ -3,7 +3,6 @@
   "extends": ["stylelint-config-standard"],
   "rules": {
     "declaration-empty-line-before": null,
-    "declaration-colon-newline-after": null,
     "declaration-no-important": true,
     "max-nesting-depth": 1,
     "selector-class-pattern": [
@@ -15,7 +14,6 @@
     "selector-max-compound-selectors": 1,
     "selector-max-id": 0,
     "selector-no-qualifying-type": true,
-    "value-list-comma-newline-after": null,
     "keyframes-name-pattern": null
   }
 }
